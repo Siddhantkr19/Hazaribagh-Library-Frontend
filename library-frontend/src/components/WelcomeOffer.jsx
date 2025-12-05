@@ -1,81 +1,87 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react'; // <--- 1. Import useState
 
 const WelcomeOffer = () => {
-  const [showOffer, setShowOffer] = useState(false);
-
-  useEffect(() => {
-    // Check if the user has already claimed the offer in local storage
-    const hasSeenOffer = localStorage.getItem('hasSeenWelcomeOffer');
-    
-    if (!hasSeenOffer) {
-      // If not, show the offer after a small delay (e.g., 1 second)
-      const timer = setTimeout(() => {
-        setShowOffer(true);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
+  // <--- 2. Add state to control visibility
+  const [isVisible, setIsVisible] = useState(true);
 
   const handleClaim = () => {
-    // Save that the user has seen the offer so it doesn't appear again
-    localStorage.setItem('hasSeenWelcomeOffer', 'true');
-    setShowOffer(false);
-    // Add logic here to actually apply the discount/offer to their account
-    alert("Offer Claimed! Check your dashboard.");
+    alert("Redirecting to Signup...");
   };
 
+  // <--- 3. Add close handler
   const handleClose = () => {
-    // Optionally save it even if they close it, or let it show again next time
-    localStorage.setItem('hasSeenWelcomeOffer', 'true');
-    setShowOffer(false);
+    setIsVisible(false);
   };
 
-  if (!showOffer) return null;
+  // <--- 4. If not visible, don't render anything
+  if (!isVisible) {
+    return null;
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-yellow-500/30 transform scale-100 transition-all">
+    // Added 'relative' class to container to ensure button positioning is correct within card
+    <div className="w-full max-w-sm mx-auto bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden shadow-2xl transform transition-all hover:scale-[1.02] duration-300 relative">
+      
+      {/* Header with decorative background */}
+      <div className="bg-gradient-to-r from-yellow-400 to-orange-500 p-6 text-center relative overflow-hidden">
         
-        {/* Header with decorative background */}
-        <div className="bg-gradient-to-r from-yellow-400 to-orange-500 p-6 text-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-white/10 rotate-12 scale-150 transform origin-bottom-left"></div>
-          <h2 className="text-3xl font-extrabold text-white relative z-10 drop-shadow-md">
-            🎉 Student Exclusive!
-          </h2>
-          <p className="text-yellow-50 font-medium mt-1 relative z-10">
-            First-time Login Special
-          </p>
+        {/* --- NEW: CLOSE BUTTON (Cross Icon) --- */}
+        <button 
+          onClick={handleClose}
+          className="absolute top-3 right-3 z-20 p-1 rounded-full bg-black/10 text-white/70 hover:text-white hover:bg-black/20 transition-all backdrop-blur-sm"
+          aria-label="Close offer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        {/* -------------------------------------- */}
+
+        {/* Decorative Circle */}
+        <div className="absolute top-0 left-0 w-full h-full bg-white/10 rotate-12 scale-150 transform origin-bottom-left"></div>
+        
+        <h2 className="text-3xl font-extrabold text-white relative z-10 drop-shadow-md">
+          🎉 Student Exclusive!
+        </h2>
+        
+        {/* Bold & Light Color Tag for First User */}
+        <div className="relative z-10 mt-3">
+          <span className="inline-block bg-white/20 border border-white/40 backdrop-blur-sm rounded-full px-4 py-1 text-white font-extrabold text-xs uppercase tracking-widest shadow-sm">
+            Special Offer for New Students
+          </span>
         </div>
 
-        {/* Content */}
-        <div className="p-6 text-center">
-          <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">
-            Welcome to the platform! Since this is your first time here, you've unlocked a special reward:
-          </p>
-          
-          <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-xl border border-dashed border-gray-400 mb-6">
-            <span className="text-2xl font-bold text-gray-800 dark:text-white block">
-              FREE EVENT PASS
-            </span>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              + Premium Notes Access
-            </span>
-          </div>
+      </div>
 
-          <button 
-            onClick={handleClaim}
-            className="w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-lg font-bold rounded-xl shadow-lg transform transition hover:-translate-y-1 hover:shadow-xl"
-          >
-            Claim My Offer 🚀
-          </button>
-          
-          <button 
-            onClick={handleClose}
-            className="mt-4 text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 underline"
-          >
-            No thanks, I'll pass
-          </button>
+      {/* Content */}
+      <div className="p-6 bg-gray-900/80 text-center">
+        <p className="text-gray-200 text-sm mb-6 leading-relaxed font-medium">
+          Welcome to LibHub! Create your account today to unlock your exclusive rewards:
+        </p>
+        
+        {/* The Reward Box */}
+        <div className="bg-gradient-to-b from-gray-800 to-gray-900 p-4 rounded-xl border border-dashed border-gray-600 mb-6 shadow-inner relative group">
+           <div className="absolute inset-0 bg-blue-500/5 rounded-xl group-hover:bg-blue-500/10 transition-colors"></div>
+           
+           <span className="text-2xl font-black text-white block drop-shadow-lg relative z-10">
+             4 DAYS FREE TRAIL
+           </span>
+           <span className="text-xs font-bold text-blue-300 uppercase tracking-wide relative z-10">
+             + With All Facilities
+           </span>
         </div>
+
+        <button 
+          onClick={handleClaim}
+          className="w-full py-3.5 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-blue-600/40 transition-all transform hover:-translate-y-1"
+        >
+          Claim  Offer 🚀
+        </button>
+        
+        <p className="mt-4 text-[10px] text-gray-400 font-medium">
+          *Valid for new Hazaribagh students only.
+        </p>
       </div>
     </div>
   );

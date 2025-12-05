@@ -19,7 +19,7 @@ const Navbar = () => {
         ? 'bg-gray-900/80 backdrop-blur-lg border-b border-white/10 py-3' 
         : 'bg-transparent py-5'
     }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-6 md:px-10">
         <div className="flex justify-between items-center">
           
           {/* BRANDING: Logo with Icon */}
@@ -32,33 +32,32 @@ const Navbar = () => {
               </svg>
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold text-white leading-none tracking-tight">
-                Lib<span className="text-blue-400">Connect</span>
+              <span className="text-xl font-bold text-blue-400   leading-none tracking-tight">
+                LibHub
               </span>
               <span className="text-[10px] text-gray-400 uppercase tracking-widest leading-none mt-1">Hazaribagh</span>
             </div>
           </Link>
 
           {/* DESKTOP NAV: Centered Floating Pill */}
-          <div className="hidden md:flex items-center space-x-1 bg-white/5 backdrop-blur-md px-2 py-1.5 rounded-full border border-white/10 shadow-xl">
+          {/* <div className="hidden md:flex items-center space-x-1 bg-white/5 backdrop-blur-md px-2 py-1.5 rounded-full border border-white/10 shadow-xl">
             <Link to="/" className="px-5 py-1.5 text-sm font-medium text-white bg-white/10 rounded-full shadow-inner transition-all">
               Home
             </Link>
             <a href="#libraries" className="px-5 py-1.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-full transition-all">
-              Browse Libraries
+               Libraries
             </a>
-            <a href="#about" className="px-5 py-1.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-full transition-all">
-              How it Works
-            </a>
-          </div>
+           
+          </div> */}
 
           {/* AUTH BUTTONS: Marketplace Style */}
-          <div className="hidden md:flex items-center gap-5">
-            <Link to="#" className="text-xs font-semibold text-gray-400 hover:text-white transition-colors uppercase tracking-wide">
-              Partner Login
-            </Link>
+          <div className="hidden md:flex items-center gap-2">
+           
             <Link to="#" className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-600/20 transition-all transform hover:-translate-y-0.5">
-              Student Sign In
+              Login
+            </Link>
+             <Link to="#" className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-600/20 transition-all transform hover:-translate-y-0.5">
+              Sign In
             </Link>
           </div>
 
@@ -83,14 +82,14 @@ const Navbar = () => {
       }`}>
         <div className="px-4 py-6 space-y-4">
           <Link to="/" className="block text-lg font-medium text-white hover:text-blue-400">Home</Link>
-          <a href="#libraries" className="block text-lg font-medium text-gray-300 hover:text-white">Browse Libraries</a>
-          <a href="#about" className="block text-lg font-medium text-gray-300 hover:text-white">How it Works</a>
+          <a href="#libraries" className="block text-lg font-medium text-gray-300 hover:text-white">Libraries</a>
+          
           <div className="pt-4 border-t border-gray-800 flex flex-col gap-3">
             <Link to="#" className="w-full py-3 text-center text-gray-400 font-medium border border-gray-700 rounded-xl hover:bg-gray-800 hover:text-white">
-              Library Owner Login
+               Login
             </Link>
             <Link to="#" className="w-full py-3 text-center bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 shadow-lg shadow-blue-900/20">
-              Student Sign In
+             Sign In
             </Link>
           </div>
         </div>

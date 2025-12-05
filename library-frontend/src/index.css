@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 @keyframes fall {
   0% {
     transform: translateY(-10vh) rotate(0deg);
@@ -18,4 +19,19 @@
 
 .animate-fall {
   animation: fall linear infinite;
+}
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-scroll {
+  display: flex;
+  width: max-content; /* Forces the container to be as wide as the cards */
+  animation: scroll 30s linear infinite; /* Adjust '30s' to make it faster/slower */
+}
+
+/* Pause the animation when user hovers over the cards */
+.animate-scroll:hover {
+  animation-play-state: paused;
 }

@@ -101,11 +101,11 @@ const Home = () => {
       <div className="relative min-h-[90vh] flex flex-col justify-center overflow-hidden pb-10">
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2673&auto=format&fit=crop" 
+            src="Background Image.jpg" 
             alt="Hazaribagh Study Center" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover brightness-95"
           />
-          <div className="absolute inset-0 bg-black/70"></div>
+          <div className="absolute inset-0 bg-black/40"></div>
         </div>
         <FallingBackground />
         

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
+ const [isDarkMode, setIsDarkMode] = useState(true);
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -13,10 +13,22 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${
       scrolled 
-        ? 'bg-gray-900/80 backdrop-blur-lg border-b border-white/10 py-3' 
+        ? 'bg-gray-900/10 backdrop-blur-md py-3' 
         : 'bg-transparent py-5'
     }`}>
       <div className="w-full px-6 md:px-10">
@@ -24,7 +36,7 @@ const Navbar = () => {
           
           {/* BRANDING: Logo with Icon */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-500/20 transform group-hover:rotate-3 transition-transform">
+            <div className="bg-orange-400 p-2 rounded-lg text-white shadow-lg shadow-blue-500/20 transform group-hover:rotate-3 transition-transform">
               {/* Simple Book Icon */}
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
@@ -32,10 +44,10 @@ const Navbar = () => {
               </svg>
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold text-blue-400   leading-none tracking-tight">
+              <span className="text-xl font-bold text-orange-400   leading-none tracking-tight">
                 LibHub
               </span>
-              <span className="text-[10px] text-gray-400 uppercase tracking-widest leading-none mt-1">Hazaribagh</span>
+              <span className="text-[10px] text-white uppercase tracking-widest leading-none mt-1">Hazaribagh</span>
             </div>
           </Link>
 
@@ -53,16 +65,47 @@ const Navbar = () => {
           {/* AUTH BUTTONS: Marketplace Style */}
           <div className="hidden md:flex items-center gap-2">
            
-            <Link to="#" className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-600/20 transition-all transform hover:-translate-y-0.5">
+            <Link to="/login" className="px-4.5 py-2.5 bg-orange-400 hover:bg-orange-300 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-600/20 transition-all transform hover:-translate-y-0.5">
               Login
             </Link>
-             <Link to="#" className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-600/20 transition-all transform hover:-translate-y-0.5">
+             <Link to="signup" className="px-4.5 py-2.5 bg-orange-400 hover:bg-orange-300 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-600/20 transition-all transform hover:-translate-y-0.5">
               Sign In
             </Link>
+            <button 
+              onClick={toggleTheme} 
+              className="ml-3 p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/10 transition-all transform hover:scale-110 shadow-lg"
+              aria-label="Toggle Dark Mode"
+            >
+              {isDarkMode ? (
+                // Sun Icon (Show when in Dark Mode)
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="yellow" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-300">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line>
+                  <line x1="21" y1="12" x2="23" y2="12"></line>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+              ) : (
+                // Moon Icon (Show when in Light Mode)
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+              )}
+            </button>
+            {/* ------------------------------------ */}
           </div>
 
           {/* MOBILE TOGGLE */}
-          <div className="md:hidden">
+         <div className="md:hidden flex items-center gap-4">
+             {/* Added Toggle to Mobile View as well for consistency */}
+             <button onClick={toggleTheme} className="text-white">
+                {isDarkMode ? "☀️" : "🌙"}
+             </button>
+
             <button onClick={() => setIsOpen(!isOpen)} className="text-white p-2">
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isOpen ? (
@@ -76,7 +119,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* MOBILE MENU */}
+     {/* MOBILE MENU */}
       <div className={`md:hidden absolute w-full bg-gray-900/95 backdrop-blur-xl border-b border-gray-800 transition-all duration-300 ${
         isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
       }`}>
@@ -88,7 +131,7 @@ const Navbar = () => {
             <Link to="#" className="w-full py-3 text-center text-gray-400 font-medium border border-gray-700 rounded-xl hover:bg-gray-800 hover:text-white">
                Login
             </Link>
-            <Link to="#" className="w-full py-3 text-center bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 shadow-lg shadow-blue-900/20">
+            <Link to="#" className="w-full py-3 text-center bg-orange-400 text-white font-bold rounded-xl hover:bg-orange-300 shadow-lg shadow-blue-900/20">
              Sign In
             </Link>
           </div>

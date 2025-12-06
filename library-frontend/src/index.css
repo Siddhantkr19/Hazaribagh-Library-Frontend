@@ -35,3 +35,19 @@
 .animate-scroll:hover {
   animation-play-state: paused;
 }
+/* ADD THIS AT THE BOTTOM OF src/index.css */
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.33%); } /* Moves 1/3rd because we have 3 sets of cards */
+}
+
+.animate-scroll {
+  display: flex; /* Ensures horizontal layout */
+  width: max-content; /* Prevents wrapping */
+  animation: scroll 40s linear infinite; /* The actual moving speed */
+}
+
+.animate-scroll:hover {
+  animation-play-state: paused; /* Stops moving when you hover */
+}

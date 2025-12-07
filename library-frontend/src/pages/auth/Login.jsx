@@ -13,7 +13,8 @@ const Login = () => {
   const [password, setPassword] = useState(''); // Added password state (though backend might only check email for now)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+const [successMessage, setSuccessMessage] = useState('');
+const [showPassword, setShowPassword] = useState(false);
   // 2. CLOSE HANDLER (Click outside)
   const handleOverlayClick = (e) => {
     if (e.target.id === 'login-overlay') {
@@ -26,19 +27,22 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccessMessage('');
 
     try {
-      // Since you don't have a dedicated /login POST endpoint that returns a token yet,
-      // we will simulate login by checking if the user profile exists via email.
-      // Ideally, you should create a POST /api/auth/login endpoint in Java.
+    
+      
       
       const response = await api.get(`/profile?userEmail=${email}`);
       
       if (response.data) {
         // Success! User found.
+          setSuccessMessage("Login Successful! Redirecting...");
         login(response.data); // Save user to global context
-        alert(`Welcome back, ${response.data.name}!`);
-        navigate('/dashboard'); // Redirect to Dashboard
+   
+       setTimeout(() => {
+          navigate('/dashboard'); 
+        }, 1000);
       } else {
         setError("User not found. Please create an account.");
       }
@@ -46,9 +50,10 @@ const Login = () => {
     } catch (err) {
       console.error("Login Error:", err);
       setError("Invalid credentials or user does not exist.");
-    } finally {
-      setLoading(false);
+       setLoading(false);
     }
+     
+    
   };
 
   return (
@@ -83,7 +88,11 @@ const Login = () => {
               {error}
             </div>
           )}
-
+        {successMessage && (
+            <div className="mb-4 p-3 bg-green-500/20 border border-green-500/50 rounded-lg text-green-500 text-md text-center font-bold animate-pulse">
+              {successMessage}
+            </div>
+          )}
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Email Address</label>
@@ -97,20 +106,39 @@ const Login = () => {
               />
             </div>
 
-            <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="block text-sm font-medium text-gray-300">Password</label>
-                <a href="#" className="text-xs font-bold text-orange-400 hover:text-orange-300">Forgot?</a>
+           <div className="relative">
+                <input 
+                  // --- CHANGE: Dynamic Type ---
+                  type={showPassword ? "text" : "password"} 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-600 text-white placeholder-gray-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all pr-10" // added pr-10 for icon space
+                  placeholder="••••••••"
+                />
+                
+                {/* --- CHANGE: Eye Icon Button --- */}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors focus:outline-none"
+                >
+                  {showPassword ? (
+                    // Eye Off Icon (Hide)
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                      <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                  ) : (
+                    // Eye Icon (Show)
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  )}
+                </button>
               </div>
-              <input 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-600 text-white placeholder-gray-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
-                placeholder="••••••••"
-              />
-            </div>
+            
 
             <button 
               disabled={loading}

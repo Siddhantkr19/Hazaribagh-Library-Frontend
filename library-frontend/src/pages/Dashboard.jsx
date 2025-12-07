@@ -38,10 +38,9 @@ const Dashboard = () => {
   if (!user) return null;
 
   return (
-    // FORCED DARK THEME: bg-gray-900 and text-white
     <div className="min-h-screen bg-gray-900 text-gray-100 pt-24 pb-12 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-300">
       
-      {/* Background Decor (Optional) */}
+      {/* Background Decor */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-orange-600/10 rounded-full blur-3xl"></div>
@@ -62,9 +61,12 @@ const Dashboard = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* ERROR FIX 1: Added 'items-start' to the grid container.
+           This is CRITICAL for 'sticky' to work. If items stretch (default), sticky does nothing.
+        */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           
-          {/* --- LEFT COLUMN: CONTENT --- */}
+          {/* --- LEFT COLUMN: SCROLLABLE CONTENT --- */}
           <div className="lg:col-span-2 space-y-8">
             
             {/* 1. Active Subscriptions */}
@@ -72,34 +74,27 @@ const Dashboard = () => {
               <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 ml-1">Active Subscriptions</h2>
               
               {loading ? (
-                // Loading Skeleton (Glass)
                 <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center animate-pulse border border-white/10">
                   <div className="h-4 bg-white/10 rounded w-1/3 mx-auto mb-4"></div>
                   <div className="h-32 bg-white/5 rounded w-full"></div>
                 </div>
               ) : activeBookings.length > 0 ? (
-                // Booking Card (Glass)
                 activeBookings.map((booking) => (
                   <div key={booking.bookingId} className="bg-white/10 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/10 relative overflow-hidden group hover:border-orange-500/30 transition-all mb-4">
                     
-                    {/* Status Badge */}
                     <div className={`absolute top-0 right-0 text-white text-[10px] font-bold px-4 py-1 rounded-bl-xl shadow-md ${booking.status === 'CONFIRMED' ? 'bg-green-500' : 'bg-red-500'}`}>
                       ● {booking.status || "ACTIVE"}
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-6">
-                      {/* Library Icon */}
                       <div className="w-full sm:w-32 h-32 bg-black/20 rounded-xl overflow-hidden flex items-center justify-center text-4xl border border-white/5">
                          📚
                       </div>
-                      
-                      {/* Details */}
                       <div className="flex-1">
                         <h3 className="text-2xl font-bold text-white mb-1">{booking.libraryName}</h3>
                         <p className="text-gray-300 text-sm mb-4 flex items-center gap-1">
                           📍 {booking.libraryAddress}
                         </p>
-                        
                         <div className="grid grid-cols-2 gap-4">
                           <div className="bg-black/20 p-3 rounded-lg border border-white/5">
                             <span className="text-[10px] text-gray-400 block uppercase tracking-wide">Seat Number</span>
@@ -113,38 +108,31 @@ const Dashboard = () => {
                       </div>
                     </div>
 
-                    {/* Progress & Contact */}
-                    <div className="mt-6 pt-4 border-t border-white/10">
-                      <div className="flex justify-between items-center text-xs text-gray-400">
-                         <p>Owner Contact: <span className="text-white font-mono">{booking.libraryOwnerContact}</span></p>
-                         <button className="text-orange-400 hover:text-orange-300 font-bold flex items-center gap-1">
-                           Download Receipt <span>↓</span>
-                         </button>
-                      </div>
+                    <div className="mt-6 pt-4 border-t border-white/10 flex justify-between items-center text-xs text-gray-400">
+                       <p>Owner Contact: <span className="text-white font-mono">{booking.libraryOwnerContact}</span></p>
+                       <button className="text-orange-400 hover:text-orange-300 font-bold flex items-center gap-1">Download Receipt <span>↓</span></button>
                     </div>
                   </div>
                 ))
               ) : (
-                // Empty State
                 <div className="bg-white/5 border-2 border-dashed border-white/10 rounded-2xl p-10 text-center flex flex-col items-center justify-center">
                   <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center text-3xl mb-4">🪑</div>
                   <h3 className="text-lg font-bold text-white">No Active Seat</h3>
-                  <p className="text-gray-400 text-sm mb-6 max-w-xs">
-                    You haven't booked a study space yet.
-                  </p>
-                  <Link to="/" className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition-colors shadow-lg">
-                    Book a Seat Now
-                  </Link>
+                  <p className="text-gray-400 text-sm mb-6 max-w-xs">You haven't booked a study space yet.</p>
+                  <Link to="/" className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition-colors shadow-lg">Book a Seat Now</Link>
                 </div>
               )}
             </div>
 
-            {/* 2. Payment History (Built from Bookings) */}
+            {/* 2. Recent Transactions (Limited Preview) */}
             {activeBookings.length > 0 && (
               <div>
-                <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 ml-1">Recent Transactions</h2>
+                <div className="flex justify-between items-end mb-4 px-1">
+                  <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Recent Transactions</h2>
+                  <Link to="/history" className="text-xs font-bold text-blue-400 hover:text-blue-300">View All</Link>
+                </div>
                 <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden">
-                  {activeBookings.map((booking, idx) => (
+                  {activeBookings.slice(0, 3).map((booking, idx) => (
                     <div key={idx} className="flex justify-between items-center p-4 border-b border-white/10 last:border-0 hover:bg-white/5 transition-colors">
                       <div className="flex items-center gap-4">
                         <div className="p-2 bg-green-500/20 rounded-full text-green-400">
@@ -165,7 +153,10 @@ const Dashboard = () => {
           </div>
 
           {/* --- RIGHT COLUMN: PROFILE & SETTINGS --- */}
-          <div className="space-y-6">
+          {/* ERROR FIX 2: Fixed typo 'slg:' to 'lg:'.
+             Added 'sticky top-28' (Top-28 adds a bit of spacing from the navbar).
+          */}
+          <div className="lg:col-span-1 space-y-6 sticky top-28">
             
             {/* Profile Card */}
             <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-6 text-white text-center shadow-2xl relative overflow-hidden group border border-white/10">
@@ -177,7 +168,6 @@ const Dashboard = () => {
                 </div>
                 <h2 className="text-xl font-bold tracking-tight">{user.name}</h2>
                 <p className="text-white/80 text-xs mb-4 font-mono">{user.email}</p>
-                
                 <div className="bg-black/20 rounded-lg p-2 backdrop-blur-sm inline-block border border-white/10">
                   <p className="text-[10px] uppercase tracking-widest opacity-70 mb-1">Phone</p>
                   <p className="text-sm font-mono font-bold tracking-wider">{user.phoneNumber}</p>
@@ -194,13 +184,16 @@ const Dashboard = () => {
                 <li className="p-3 hover:bg-white/10 rounded-xl cursor-pointer flex items-center gap-3 transition-colors">
                   <span>👤</span> Edit Profile
                 </li>
-                <li className="p-3 hover:bg-white/10 rounded-xl cursor-pointer flex items-center gap-3 transition-colors">
-                  <span>💳</span> Payment History
-                </li>
-                <li 
-                  onClick={logout} 
-                  className="p-3 hover:bg-red-500/20 text-red-400 rounded-xl cursor-pointer flex items-center gap-3 transition-colors font-bold mt-1"
-                >
+                {/* ERROR FIX 3: Removed the extra nesting.
+                   You had <Link> wrapping an <li> wrapping another <li>.
+                   Cleaned it up below. 
+                */}
+                <Link to="/history">
+                  <li className="p-3 hover:bg-white/10 rounded-xl cursor-pointer flex items-center gap-3 transition-colors">
+                    <span>💳</span> Payment History
+                  </li>
+                </Link>
+                <li onClick={logout} className="p-3 hover:bg-red-500/20 text-red-400 rounded-xl cursor-pointer flex items-center gap-3 transition-colors font-bold mt-1">
                   <span>🚪</span> Logout
                 </li>
               </ul>

@@ -65,7 +65,7 @@ const LibraryCard = ({ library }) => {
               ₹{price}<span className="text-xs text-gray-500 dark:text-gray-400 font-normal">/month</span>
             </p>
           </div>
-        {/* Replace the <button> with this <Link> */}
+    
 <Link 
   to={`/book/${library.id}`} 
   className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-black text-sm font-bold rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-lg"

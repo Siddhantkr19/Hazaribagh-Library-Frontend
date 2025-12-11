@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-// Icons: Book, Pen, Notebook
 const icons = {
   book: (
     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -36,7 +35,6 @@ const FallingBackground = () => {
         transform: `scale(${Math.random() * 0.5 + 0.8})`, 
       };
       
-      // NEW: Specific Vibrant Colors for differentiation
       // Using '300' shade to ensure they are bright/light enough on dark background
       const colors = [
         'text-rose-300',    // Red/Pinkish
@@ -46,10 +44,10 @@ const FallingBackground = () => {
         'text-violet-300'   // Purple
       ];
       
-      // Select a random color from the list
+      
       const colorClass = colors[Math.floor(Math.random() * colors.length)];
 
-      // Add 'opacity-60' to make them visible but not overwhelming
+      
       return { id: i, type, style, colorClass: `${colorClass} opacity-60` };
     });
     setItems(newItems);

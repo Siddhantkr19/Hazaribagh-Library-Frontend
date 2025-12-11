@@ -2,15 +2,14 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import FallingBackground from '../../components/FallingBackground';
 import api from '../../services/api';
-import { useAuth } from '../../context/AuthContext'; // Import Auth Context
-
+import { useAuth } from '../../context/AuthContext'; 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth(); // Access login function from context
+  const { login } = useAuth(); 
 
   // 1. STATE
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState(''); // Added password state (though backend might only check email for now)
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 const [successMessage, setSuccessMessage] = useState('');
@@ -73,7 +72,7 @@ const [showPassword, setShowPassword] = useState(false);
       {/* CARD */}
       <div 
         className="relative z-10 w-full max-w-md px-4 cursor-default"
-        onClick={(e) => e.stopPropagation()} // Prevent close when clicking inside
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl p-8 sm:p-10 animate-in fade-in zoom-in duration-500">
           

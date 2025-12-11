@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Import your auth context
-
+import { useAuth } from '../context/AuthContext'; 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const navigate = useNavigate();
-  const { user } = useAuth(); // Access the user object from context
+  const { user } = useAuth(); 
 
   useEffect(() => {
     const handleScroll = () => {

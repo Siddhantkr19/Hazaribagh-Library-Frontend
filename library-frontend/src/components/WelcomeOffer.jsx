@@ -1,31 +1,29 @@
-import React, { useState } from 'react'; // <--- 1. Import useState
-
+import React, { useState } from 'react'; 
 const WelcomeOffer = () => {
-  // <--- 2. Add state to control visibility
+  
   const [isVisible, setIsVisible] = useState(true);
 
   const handleClaim = () => {
     alert("Redirecting to Signup...");
   };
 
-  // <--- 3. Add close handler
+
   const handleClose = () => {
     setIsVisible(false);
   };
 
-  // <--- 4. If not visible, don't render anything
+  
   if (!isVisible) {
     return null;
   }
 
   return (
-    // Added 'relative' class to container to ensure button positioning is correct within card
+   
     <div className="w-full max-w-sm mx-auto bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden shadow-2xl transform transition-all hover:scale-[1.02] duration-300 relative">
       
-      {/* Header with decorative background */}
       <div className="bg-gradient-to-r from-yellow-400 to-orange-500 p-6 text-center relative overflow-hidden">
         
-        {/* --- NEW: CLOSE BUTTON (Cross Icon) --- */}
+     
         <button 
           onClick={handleClose}
           className="absolute top-3 right-3 z-20 p-1 rounded-full bg-black/10 text-white/70 hover:text-white hover:bg-black/20 transition-all backdrop-blur-sm"

@@ -61,9 +61,7 @@ const Dashboard = () => {
           </Link>
         </div>
 
-        {/* ERROR FIX 1: Added 'items-start' to the grid container.
-           This is CRITICAL for 'sticky' to work. If items stretch (default), sticky does nothing.
-        */}
+        
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           
           {/* --- LEFT COLUMN: SCROLLABLE CONTENT --- */}
@@ -153,9 +151,7 @@ const Dashboard = () => {
           </div>
 
           {/* --- RIGHT COLUMN: PROFILE & SETTINGS --- */}
-          {/* ERROR FIX 2: Fixed typo 'slg:' to 'lg:'.
-             Added 'sticky top-28' (Top-28 adds a bit of spacing from the navbar).
-          */}
+        
           <div className="lg:col-span-1 space-y-6 sticky top-28">
             
             {/* Profile Card */}
@@ -184,10 +180,7 @@ const Dashboard = () => {
                 <li className="p-3 hover:bg-white/10 rounded-xl cursor-pointer flex items-center gap-3 transition-colors">
                   <span>👤</span> Edit Profile
                 </li>
-                {/* ERROR FIX 3: Removed the extra nesting.
-                   You had <Link> wrapping an <li> wrapping another <li>.
-                   Cleaned it up below. 
-                */}
+              
                 <Link to="/history">
                   <li className="p-3 hover:bg-white/10 rounded-xl cursor-pointer flex items-center gap-3 transition-colors">
                     <span>💳</span> Payment History

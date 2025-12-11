@@ -25,7 +25,6 @@ const [showPassword, setShowPassword] = useState(false);
 
   // Handler to close the modal when clicking outside
   const handleOverlayClick = (e) => {
-    // Only close if the click is directly on the overlay container, not its children
     if (e.target.id === 'auth-overlay') {
       navigate('/');
     }

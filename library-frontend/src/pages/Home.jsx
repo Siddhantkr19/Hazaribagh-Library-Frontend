@@ -160,7 +160,7 @@ const Home = () => {
 
        {/* --- SCROLLING CONTAINER --- */}
         <div className="relative w-full overflow-hidden">
-          {/* The Wrapper that moves (animate-scroll defined in index.css) */}
+        
           <div className="animate-scroll flex gap-8 px-4 w-max">
             
             {/* ORIGINAL SET OF CARDS */}

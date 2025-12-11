@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from "../../context/AuthContext"; // ✅ Correct (2 dots to go up, then up again)
+import { useAuth } from "../../context/AuthContext"; 
 import bookingApi from "../../services/bookingApi";
-//  import { useAuth } from "../context/AuthContext";
+
 
 const PaymentHistory = () => {
   const { user } = useAuth();

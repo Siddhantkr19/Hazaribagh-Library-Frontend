@@ -28,7 +28,7 @@ const Booking = () => {
     // Simulate API delay
     setTimeout(() => {
       setLoading(false);
-      setStep('payment'); // Move to Payment Step
+      setStep('payment'); 
     }, 1500);
   };
 

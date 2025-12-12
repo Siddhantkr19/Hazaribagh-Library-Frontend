@@ -3,6 +3,7 @@ import FallingBackground from '../components/FallingBackground';
 import LibrarySearch from '../components/LibrarySearch';
 import LibraryCard from '../components/LibraryCard';
 import WelcomeOffer from '../components/WelcomeOffer';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
   const [text, setText] = useState('');
@@ -95,7 +96,7 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-500 dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-900 transition-colors duration-300">
       
       {/* SECTION 1: HERO */}
       <div className="relative min-h-[90vh] flex flex-col justify-center overflow-hidden pb-10">
@@ -147,15 +148,15 @@ const Home = () => {
 
       {/* SECTION 2: FEATURED LIBRARIES */}
      
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16  ">
         
         <div className="flex justify-between items-end mb-8">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Trending Libraries</h2>
+            <h2 className="text-3xl font-bold text-gray-200 dark:text-white">Trending Libraries</h2>
             <p className="text-gray-500 dark:text-gray-400 mt-1">Most popular among students in Hazaribagh</p>
           </div>
             
-          <a href="#" className="text-blue-600 dark:text-blue-400 font-bold hover:underline">View All &rarr;</a>
+         <Link to="/libraries" className="text-blue-600 dark:text-blue-400 font-bold hover:underline">View All &rarr;</Link>
         </div>
 
        {/* --- SCROLLING CONTAINER --- */}
@@ -191,10 +192,6 @@ const Home = () => {
 
           </div>
         </div>
-
-
-
-
       </div>
 
     </div>

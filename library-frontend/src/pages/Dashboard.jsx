@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import bookingApi from '../services/bookingApi';
+import profilePictureService from '../services/profilePicture';
+// import profilePictureService from '../services/profilePicture';
 
 const Dashboard = () => {
-  const { user, logout } = useAuth(); 
+const { user, login, logout } = useAuth(); // Destructure login
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
   
   const [activeBookings, setActiveBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-
+const [uploading, setUploading] = useState(false);
   // 1. Protect Route
   useEffect(() => {
     if (!user) {
@@ -37,6 +40,50 @@ const Dashboard = () => {
 
   if (!user) return null;
 
+const handleImageChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.match('image.*')) {
+      alert("Please select a valid image (JPG, PNG)");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      // Use the service you created
+      const updatedUser = await profilePictureService.uploadProfilePicture(user.email, file);
+
+      // Update Local Context with new User Data so image updates instantly
+      login(updatedUser); 
+      alert("Profile picture updated successfully!");
+
+    } catch (error) {
+      console.error("Upload failed", error);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // ADDED: Trigger hidden file input
+  const triggerFileInput = () => {
+    fileInputRef.current.click();
+  };
+
+  // ADDED: Helper to construct image URL
+const getProfileImage = () => {
+    if (!user.profilePicture) return null;
+    
+    // If it's already a full URL (e.g. from Google or previous upload), use it
+    if (user.profilePicture.startsWith("http")) return user.profilePicture;
+    
+    // Otherwise, prepend the backend URL (assuming it serves static files)
+    return `http://localhost:8080${user.profilePicture}`; 
+  };
+  if (!user) return null;
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 pt-24 pb-12 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-300">
       
@@ -152,34 +199,60 @@ const Dashboard = () => {
 
           {/* --- RIGHT COLUMN: PROFILE & SETTINGS --- */}
         
-          <div className="lg:col-span-1 space-y-6 sticky top-28">
+        <div className="lg:col-span-1 space-y-6 sticky top-28">
             
-            {/* Profile Card */}
+    
+            
+            {/* PROFILE CARD WITH CAMERA UPLOAD */}
             <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-6 text-white text-center shadow-2xl relative overflow-hidden group border border-white/10">
-              <div className="absolute top-0 left-0 w-full h-full bg-white/10 rotate-12 scale-150 origin-top-left transition-transform group-hover:rotate-45 duration-700"></div>
               
-              <div className="relative z-10">
-                <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full mx-auto p-1 mb-4 shadow-lg flex items-center justify-center text-3xl font-bold border-2 border-white/30">
-                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+              {/* Profile Image Container */}
+              <div className="relative w-24 h-24 mx-auto mb-4 group/image">
+                <div className="w-full h-full rounded-full border-4 border-white/30 shadow-lg overflow-hidden bg-white/20 flex items-center justify-center text-3xl font-bold">
+                  {getProfileImage() ? (
+                    <img src={getProfileImage()} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    user.name ? user.name.charAt(0).toUpperCase() : 'U'
+                  )}
                 </div>
-                <h2 className="text-xl font-bold tracking-tight">{user.name}</h2>
-                <p className="text-white/80 text-xs mb-4 font-mono">{user.email}</p>
-                <div className="bg-black/20 rounded-lg p-2 backdrop-blur-sm inline-block border border-white/10">
-                  <p className="text-[10px] uppercase tracking-widest opacity-70 mb-1">Phone</p>
-                  <p className="text-sm font-mono font-bold tracking-wider">{user.phoneNumber}</p>
+
+                {/* Camera Icon Overlay (Clickable) */}
+                <div 
+                  onClick={triggerFileInput}
+                  className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity cursor-pointer"
+                >
+                  {uploading ? (
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                  ) : (
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  )}
                 </div>
+
+                {/* Hidden File Input */}
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleImageChange} 
+                  accept="image/png, image/jpeg, image/jpg"
+                  className="hidden" 
+                />
+              </div>
+
+              <h2 className="text-xl font-bold tracking-tight">{user.name}</h2>
+              <p className="text-white/80 text-xs mb-4 font-mono">{user.email}</p>
+              
+              <div className="bg-black/20 rounded-lg p-2 backdrop-blur-sm inline-block border border-white/10">
+                <p className="text-[10px] uppercase tracking-widest opacity-70 mb-1">Phone</p>
+                <p className="text-sm font-mono font-bold tracking-wider">{user.phoneNumber}</p>
               </div>
             </div>
-
             {/* Quick Actions */}
             <div className="bg-white/10 backdrop-blur-md rounded-2xl p-2 shadow-lg border border-white/10">
               <div className="p-3 border-b border-white/10">
                 <h3 className="font-bold text-gray-300 text-xs uppercase tracking-wide">Settings</h3>
               </div>
               <ul className="text-sm text-gray-300">
-                <li className="p-3 hover:bg-white/10 rounded-xl cursor-pointer flex items-center gap-3 transition-colors">
-                  <span>👤</span> Edit Profile
-                </li>
+              
               
                 <Link to="/history">
                   <li className="p-3 hover:bg-white/10 rounded-xl cursor-pointer flex items-center gap-3 transition-colors">

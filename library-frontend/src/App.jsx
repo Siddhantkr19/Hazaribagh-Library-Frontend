@@ -6,6 +6,7 @@ import PaymentHistory from "./pages/auth/PaymentHistory";
 import Home from "./pages/Home";
 import Booking from "./pages/Booking"; 
 import Dashboard from "./pages/Dashboard"; 
+import AllLibraries from "./pages/AllLibraries";
 function App() {
   return (
     <Router>
@@ -19,6 +20,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/history" element={<PaymentHistory />} />
+          <Route path="/libraries" element={<AllLibraries />} />
         </Routes>
       </div>
       

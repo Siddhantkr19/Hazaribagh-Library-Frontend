@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import FallingBackground from '../../components/FallingBackground';
+
 import api from '../../services/api';
 
 const Signup = () => {
@@ -74,8 +74,7 @@ const [showPassword, setShowPassword] = useState(false);
         <img src="/Background Image.jpg" alt="Library Background" className="w-full h-full object-cover opacity-50" />
         <div className="absolute inset-0 bg-black/60"></div>
       </div>
-      <FallingBackground />
-
+   
       {/* CARD - Stop propagation to prevent closing when clicking inside */}
       <div 
         className="relative z-10 w-full max-w-lg px-4 cursor-default"

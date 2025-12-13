@@ -1,15 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import FallingBackground from '../components/FallingBackground';
+import React, { useState, useEffect , useRef } from 'react';
+
 import LibrarySearch from '../components/LibrarySearch';
 import LibraryCard from '../components/LibraryCard';
 import WelcomeOffer from '../components/WelcomeOffer';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const Home = () => {
+
+ const [trendingLibraries, setTrendingLibraries] = useState([]);
+  const [searchResults, setSearchResults] = useState(null); // null means "no search active"
+  const [loading, setLoading] = useState(true);
+  
+  // Ref to auto-scroll to results
+  const resultsRef = useRef(null);
+
+
+
   const [text, setText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [loopNum, setLoopNum] = useState(0);
   const [typingSpeed, setTypingSpeed] = useState(150);
+
 
   const phrases = ["Focus Zone", "Best Library", "Study Space"];
   
@@ -21,7 +33,7 @@ const Home = () => {
     "from-fuchsia-300 to-violet-400",
     "from-red-400 to-orange-400"
   ];
-
+ const currentGradient = gradients[loopNum % gradients.length];
   useEffect(() => {
     const handleTyping = () => {
       const i = loopNum % phrases.length;
@@ -35,66 +47,55 @@ const Home = () => {
     return () => clearTimeout(timer);
   }, [text, isDeleting, loopNum]);
 
-  const currentGradient = gradients[loopNum % gradients.length];
+  // --- HELPER: MAPPER FUNCTION ---
+  const mapBackendDataToFrontend = (data) => {
+    return data.map(lib => ({
+        id: lib.id,
+        name: lib.name,
+        location: lib.locationTag || lib.address || "Hazaribagh", 
+        seats: lib.totalSeats || 0,
+        price: lib.offerPrice,
+        oldPrice: lib.originalPrice,
+        rating: 4.5, 
+        amenities: lib.amenities || ["WiFi", "AC"], 
+        image: (lib.images && lib.images.length > 0) 
+               ? lib.images[0] 
+               : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop"
+    }));
+  };
   
-  const libraries = [
-    {
-      id: 1,
-      name: "Focus Point Library",
-      location: "Matwari, Hazaribagh",
-      seats: 3,
-      price: 350,
-      oldPrice: 400,
-      rating: 4.8,
-      amenities: ["AC", "WiFi", "RO Water"],
-      image: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop"
-    },
-    {
-      id: 8,
-      name: "Scholar's Den",
-      location: "Korrah, Near Chowk",
-      seats: 12,
-      price: 400,
-      oldPrice: 450,
-      rating: 4.5,
-      amenities: ["WiFi", "Power Backup", "Locker"],
-      image: "https://images.unsplash.com/photo-1568667256549-094345857637?q=80&w=2515&auto=format&fit=crop"
-    },
-    {
-      id: 5,
-      name: "Silent Zone Study Center",
-      location: "Babu Gaon",
-      seats: 5,
-      price: 450,
-      oldPrice: 500,
-      rating: 4.9,
-      amenities: ["AC", "Discussion Room", "Coffee"],
-      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2669&auto=format&fit=crop"
-    },
-    {
-      id: 2,
-      name: "Scholar's Den",
-      location: "Korrah, Near Chowk",
-      seats: 12,
-      price: 500,
-      oldPrice: 550,
-      rating: 4.5,
-      amenities: ["WiFi", "Power Backup", "Locker"],
-      image: "https://images.unsplash.com/photo-1568667256549-094345857637?q=80&w=2515&auto=format&fit=crop"
-    },
-    {
-      id: 3,
-      name: "Silent Zone Study Center",
-      location: "Babu Gaon",
-      seats: 5,
-      price: 550,
-      oldPrice: 600,
-      rating: 4.9,
-      amenities: ["AC", "Discussion Room", "Coffee"],
-      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2669&auto=format&fit=crop"
-    }
-  ];
+ // --- 2. INITIAL FETCH (Populates Trending Only) ---
+  useEffect(() => {
+    const fetchTrendingLibraries = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/libraries');
+        const formattedData = mapBackendDataToFrontend(response.data);
+        setTrendingLibraries(formattedData.slice(0, 5)); // Keep distinct
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch trending libraries", error);
+        setLoading(false);
+      }
+    };
+    fetchTrendingLibraries();
+  }, []);
 
+
+ // --- 3. SEARCH HANDLER (Populates Search Results Only) ---
+  const handleSearchResults = (data) => {
+    const formattedData = mapBackendDataToFrontend(data);
+    setSearchResults(formattedData);
+    
+    // Smooth scroll to the results section
+    setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
+
+  // --- 4. CLEAR SEARCH ---
+  const clearSearch = () => {
+    setSearchResults(null);
+  };
   return (
     <div className="min-h-screen bg-gray-900 dark:bg-gray-900 transition-colors duration-300">
       
@@ -108,7 +109,7 @@ const Home = () => {
           />
           <div className="absolute inset-0 bg-black/40"></div>
         </div>
-        <FallingBackground />
+      
         
         {/* --- GRID CONTAINER --- */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mt-24">
@@ -129,7 +130,7 @@ const Home = () => {
               Join 1000+ students booking the best private libraries in Hazaribagh.
             </p>
             <div className="w-full max-w-xl mx-auto lg:mx-0">
-               <LibrarySearch />
+              <LibrarySearch onSearch={handleSearchResults} />
             </div>
             {/* MOVED SEARCH BAR INSIDE LEFT COLUMN */}
            
@@ -146,7 +147,53 @@ const Home = () => {
         </div>
       </div>
 
-      {/* SECTION 2: FEATURED LIBRARIES */}
+
+
+      {/* ================= SECTION 2: SEARCH RESULTS (CONDITIONAL) ================= */}
+      {/* This section appears ONLY when searchResults is not null */}
+      
+      {searchResults && (
+        <div ref={resultsRef} className="relative z-20 py-12 bg-gray-900/95 border-y border-white/10 backdrop-blur-lg">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                {/* Header Row */}
+                <div className="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                            <span className="text-blue-500">🔍</span> Search Results
+                        </h2>
+                        <p className="text-gray-400 text-sm mt-1">
+                            Found <span className="text-white font-bold">{searchResults.length}</span> libraries matching your criteria.
+                        </p>
+                    </div>
+                    <button 
+                        onClick={clearSearch}
+                        className="px-4 py-2 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white rounded-lg text-sm font-bold border border-red-500/30 transition-all"
+                    >
+                        ✕ Clear Search
+                    </button>
+                </div>
+
+                {/* Results Grid */}
+                {searchResults.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {searchResults.map((lib) => (
+                            <div key={`search-${lib.id}`} className="transform hover:scale-[1.02] transition-transform duration-300">
+                                <LibraryCard library={lib} />
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-10 bg-white/5 rounded-2xl border border-dashed border-white/20">
+                        <p className="text-xl text-gray-400">No libraries found.</p>
+                        <p className="text-sm text-gray-500 mt-2">Try searching for "Matwari", "Korrah" or a different price.</p>
+                    </div>
+                )}
+            </div>
+        </div>
+      )}
+
+      {/* SECTION 3: FEATURED LIBRARIES */}
      
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16  ">
         
@@ -166,7 +213,7 @@ const Home = () => {
             
             {/* ORIGINAL SET OF CARDS */}
             <div className="flex gap-8">
-              {libraries.map((lib) => (
+              {trendingLibraries.map((lib) => (
                 <div key={`orig-${lib.id}`} className="w-[350px]"> {/* Fixed Width for Cards in Slider */}
                    <LibraryCard library={lib} />
                 </div>
@@ -175,7 +222,7 @@ const Home = () => {
 
             {/* DUPLICATE SET OF CARDS (For Loop Effect) */}
             <div className="flex gap-8">
-              {libraries.map((lib) => (
+              {trendingLibraries.map((lib) => (
                 <div key={`dup-${lib.id}`} className="w-[350px]">
                    <LibraryCard library={lib} />
                 </div>
@@ -183,7 +230,7 @@ const Home = () => {
             </div>
              {/* TRIPLICATE SET (Optional, ensures no gaps on wide screens) */}
              <div className="flex gap-8">
-              {libraries.map((lib) => (
+              {trendingLibraries.map((lib) => (
                 <div key={`tri-${lib.id}`} className="w-[350px]">
                    <LibraryCard library={lib} />
                 </div>

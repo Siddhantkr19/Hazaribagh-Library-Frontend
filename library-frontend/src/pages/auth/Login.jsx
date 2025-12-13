@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import FallingBackground from '../../components/FallingBackground';
+
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext'; 
 const Login = () => {
@@ -22,38 +22,43 @@ const [showPassword, setShowPassword] = useState(false);
   };
 
   // 3. LOGIN HANDLER
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccessMessage('');
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccessMessage('');
 
-    try {
-    
-      
-      
-      const response = await api.get(`/profile?userEmail=${email}`);
-      
-      if (response.data) {
-        // Success! User found.
-          setSuccessMessage("Login Successful! Redirecting...");
-        login(response.data); // Save user to global context
-   
-       setTimeout(() => {
-          navigate('/dashboard'); 
-        }, 1000);
+    try {
+      // --- CHANGE START ---
+      // 1. Use .post() instead of .get()
+      // 2. Pass the data { email, password } as the second argument
+      const response = await api.post('/login', { 
+          email: email, 
+          password: password 
+      });
+      // --- CHANGE END ---
+      
+      if (response.data) {
+        // Success! User found.
+          setSuccessMessage("Login Successful! Redirecting...");
+        login(response.data); // Save user to global context
+   
+       setTimeout(() => {
+          navigate('/dashboard'); 
+        }, 1000);
+      } 
+
+    } catch (err) {
+      console.error("Login Error:", err);
+      // Optional: Check specifically for 403 or 401 errors
+      if (err.response && err.response.status === 403) {
+          setError("Invalid password or email.");
       } else {
-        setError("User not found. Please create an account.");
+          setError("Login failed. Please try again.");
       }
-
-    } catch (err) {
-      console.error("Login Error:", err);
-      setError("Invalid credentials or user does not exist.");
-       setLoading(false);
-    }
-     
-    
-  };
+      setLoading(false);
+    }
+  };
 
   return (
     <div 
@@ -67,7 +72,7 @@ const [showPassword, setShowPassword] = useState(false);
         <img src="/Background Image.jpg" alt="Library Background" className="w-full h-full object-cover opacity-50" />
         <div className="absolute inset-0 bg-black/60"></div>
       </div>
-      <FallingBackground />
+     
 
       {/* CARD */}
       <div 

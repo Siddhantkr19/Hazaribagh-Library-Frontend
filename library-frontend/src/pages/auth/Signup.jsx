@@ -51,7 +51,7 @@ const [showPassword, setShowPassword] = useState(false);
         profilePicture: null
       };
 
-      await api.post('/register', payload);
+      await api.post('/auth/register', payload);
       setSuccess(true); // Show success message instead of redirecting immediately
 
     } catch (err) {

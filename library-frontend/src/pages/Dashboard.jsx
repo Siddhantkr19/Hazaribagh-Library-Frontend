@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import bookingApi from '../services/bookingApi';
 import profilePictureService from '../services/profilePicture';
 // import profilePictureService from '../services/profilePicture';
+import api from '../services/api';
 
 const Dashboard = () => {
 const { user, login, logout } = useAuth(); // Destructure login
@@ -37,6 +38,20 @@ const [uploading, setUploading] = useState(false);
 
     fetchDashboardData();
   }, [user]);
+
+  // --- [NEW] LOGOUT HANDLER ---
+  const handleLogout = async () => {
+    try {
+        // 1. Call Backend to clear Cookie
+        await api.post('/auth/logout'); 
+    } catch (error) {
+        console.error("Logout failed on server", error);
+    } finally {
+        // 2. Clear Frontend State
+        logout(); 
+        navigate('/');
+    }
+  };
 
   if (!user) return null;
 
@@ -259,7 +274,8 @@ const getProfileImage = () => {
                     <span>💳</span> Payment History
                   </li>
                 </Link>
-                <li onClick={logout} className="p-3 hover:bg-red-500/20 text-red-400 rounded-xl cursor-pointer flex items-center gap-3 transition-colors font-bold mt-1">
+               {/* [CHANGED] Connected Logout to Backend */}
+                <li onClick={handleLogout} className="p-3 hover:bg-red-500/20 text-red-400 rounded-xl cursor-pointer flex items-center gap-3 transition-colors font-bold mt-1">
                   <span>🚪</span> Logout
                 </li>
               </ul>

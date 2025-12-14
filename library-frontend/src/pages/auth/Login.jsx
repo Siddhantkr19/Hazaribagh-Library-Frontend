@@ -32,7 +32,7 @@ const [showPassword, setShowPassword] = useState(false);
       // --- CHANGE START ---
       // 1. Use .post() instead of .get()
       // 2. Pass the data { email, password } as the second argument
-      const response = await api.post('/login', { 
+      const response = await api.post('/auth/login', { 
           email: email, 
           password: password 
       });

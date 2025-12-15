@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 import api from '../../services/api';
 
 const Signup = () => {
   const navigate = useNavigate();
+ const { user } = useAuth();
+  // --- [FIX] AUTO-REDIRECT ---
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+  //
   
   const [formData, setFormData] = useState({
     name: '',
@@ -150,7 +159,7 @@ const [showPassword, setShowPassword] = useState(false);
                       value={formData.phone}
                       onChange={handleChange}
                       type="tel" 
-                      required
+                      // required
                       className="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-600 text-white focus:ring-2 focus:ring-blue-500 outline-none" 
                       placeholder="9988776655" 
                     />
@@ -202,10 +211,14 @@ const [showPassword, setShowPassword] = useState(false);
                 <div className="relative flex justify-center text-xs uppercase"><span className="px-2 bg-transparent text-gray-400">Or</span></div>
               </div>
 
-              <button className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-600 rounded-xl hover:bg-white/5 transition-all text-white font-medium text-sm">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-                Sign up with Google
-              </button>
+            {/* // ✅ NEW CODE (Link to Backend) */}
+<a 
+  href="http://localhost:8080/oauth2/authorization/google"
+  className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-600 rounded-xl hover:bg-white/5 transition-all text-white font-medium text-sm"
+>
+  <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+  Sign up with Google
+</a>
 
               <p className="mt-6 text-center text-sm text-gray-400">
                 Already have an account?{' '}

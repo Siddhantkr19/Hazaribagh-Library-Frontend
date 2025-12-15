@@ -1,33 +1,44 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import api from '../services/api'; // [IMPORTANT] Import your API helper
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Added loading state
+  const [loading, setLoading] = useState(true);
 
-  // Check if user info is in localStorage on app start
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    const loadUser = async () => {
+      try {
+        // 1. Try to fetch the user from the Backend (using the Cookie)
+        const { data } = await api.get('/auth/current-user');
+        setUser(data);
+        localStorage.setItem('user', JSON.stringify(data)); // Sync localStorage
+      } catch (error) {
+        // 2. If Backend fails (cookie expired/missing), check localStorage as backup
+        // or just clear everything.
+        console.log("No active session found.");
+        localStorage.removeItem('user');
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUser();
   }, []);
 
-  // Login: Update State + Save UI Info to LocalStorage
+  .
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
-  // Logout: Clear State + Clear LocalStorage
-  // (Note: The Backend API call to clear the cookie happens in the Dashboard/Component)
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
-    // Optional: Redirect is usually handled by the component, but this is a safe fallback
-    window.location.href = '/login'; 
+    window.location.href = '/'; 
+    
   };
 
   return (

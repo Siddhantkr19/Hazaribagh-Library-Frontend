@@ -10,6 +10,9 @@ import AllLibraries from "./pages/AllLibraries";
 import LibraryDetails from './pages/LibraryDetails';
 import Footer from './components/Footer';
 import FallingBackground from './components/FallingBackground';
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword" ;
+
 function App() {
   return (
     <Router>
@@ -35,6 +38,8 @@ function App() {
           <Route path="/history" element={<PaymentHistory />} />
           <Route path="/libraries" element={<AllLibraries />} />
           <Route path="/libraries/:id" element={<LibraryDetails />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+             <Route path="/reset-password" element={<ResetPassword />} />
         </Routes>
       </div>
       <Footer />

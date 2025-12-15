@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-
-import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext'; 
+import api from '../../services/api';
+
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth(); 
+  const { login , user } = useAuth(); 
+
+  // --- [FIX] AUTO-REDIRECT IF LOGGED IN ---
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard'); // If user exists, go to Dashboard instantly
+    }
+  }, [user, navigate]);
+  // ----------------------------------------
 
   // 1. STATE
   const [email, setEmail] = useState('');
@@ -142,7 +150,15 @@ const [showPassword, setShowPassword] = useState(false);
                   )}
                 </button>
               </div>
-            
+            {/* --- [NEW CODE START] INSERT THIS RIGHT AFTER THE PASSWORD DIV --- */}
+<div className="flex justify-end mt-2">
+    <Link 
+      to="/forgot-password" 
+      className="text-sm text-orange-400 hover:text-orange-300 hover:underline transition-colors"
+    >
+      Forgot Password?
+    </Link>
+</div>
 
             <button 
               disabled={loading}
@@ -157,10 +173,13 @@ const [showPassword, setShowPassword] = useState(false);
             <div className="relative flex justify-center text-xs uppercase"><span className="px-2 bg-transparent text-gray-400">Or continue with</span></div>
           </div>
 
-          <button className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-600 rounded-xl hover:bg-white/5 transition-all text-white font-medium text-sm">
-            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-            Login with Google
-          </button>
+         <a 
+  href="http://localhost:8080/oauth2/authorization/google"
+  className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-600 rounded-xl hover:bg-white/5 transition-all text-white font-medium text-sm"
+>
+  <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+  Login with Google
+</a>
 
           <p className="mt-8 text-center text-sm text-gray-400">
             Don't have an account?{' '}

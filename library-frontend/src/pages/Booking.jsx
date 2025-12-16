@@ -1,187 +1,326 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { createOrderAPI, verifyPaymentAPI } from '../services/bookingApi';
+import { MapPin, Wifi, Zap, Coffee, ShieldCheck, CheckCircle, Loader2, ArrowRight } from 'lucide-react';
 
 const Booking = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, login } = useAuth(); // Assuming login function is available in context to update local state if needed
+
+  // State Management
+  const [step, setStep] = useState('loading'); // 'loading' | 'login' | 'payment' | 'success'
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [library, setLibrary] = useState(null);
   
-  // State for the interactive flow
-  const [step, setStep] = useState('login'); // 'login' | 'payment' | 'success'
-  const [loading, setLoading] = useState(false);
+  // Login Form State
   const [email, setEmail] = useState('');
 
-  // Fake Library Data (In real app, fetch by ID)
-  const library = {
-    name: "Focus Point Library",
-    location: "Matwari, Hazaribagh",
-    image: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop",
-    price: 400,
-    discount: 50 // The First-Time User discount
-  };
+  // Pricing State
+  const [priceDetails] = useState({
+    basePrice: 400,
+    discount: 50, // Highlight the discount
+    finalPrice: 350
+  });
 
-  // Handle Login Simulation
-  const handleLogin = (e) => {
+  // [EFFECT] 1. Load Data & Check Auth
+  useEffect(() => {
+    // Simulate fetching library details
+    setTimeout(() => {
+      setLibrary({
+        id: id,
+        name: "Focus Point Library",
+        location: "Matwari, Hazaribagh",
+        image: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2301&auto=format&fit=crop",
+        rating: 4.8,
+        amenities: ["High-Speed Wifi", "AC", "Power Backup", "Water"]
+      });
+      
+      // Determine initial step based on Auth
+      if (user) {
+        setStep('payment');
+      } else {
+        setStep('login');
+      }
+    }, 800); // Small artificial delay for smooth loading animation
+  }, [user, id]);
+
+  // [ACTION] Handle Login (Frontend Simulation for Flow)
+  const handleLoginSubmit = (e) => {
     e.preventDefault();
-    if (!email) return alert("Please enter an email");
-    
-    setLoading(true);
-    // Simulate API delay
+    setIsProcessing(true);
+    // In a real app, you would call your Login API here
     setTimeout(() => {
-      setLoading(false);
-      setStep('payment'); 
-    }, 1500);
+        setIsProcessing(false);
+        // Navigate to login page usually, but for this flow we might just redirect
+        navigate('/login', { state: { returnUrl: `/book/${id}` } });
+    }, 1000);
   };
 
-  // Handle Payment Simulation
-  const handlePayment = () => {
-    setLoading(true);
-    // Simulate Razorpay processing
-    setTimeout(() => {
-      setLoading(false);
-      setStep('success'); // Show Success Receipt
-    }, 2000);
+  // [ACTION] 2. Handle Payment (The Real Razorpay Flow)
+  const handlePayment = async () => {
+    if (!user || !library) return alert("User or Library not found");
+
+    setIsProcessing(true);
+
+    try {
+      // A. Call Backend to Create Order
+      const orderData = await createOrderAPI(user.email, library.id);
+      
+      // B. Razorpay Options
+      const options = {
+        key: "rzp_test_RsHxpfN8FVqy1g", // [YOUR KEY ID]
+        amount: orderData.amountPaid * 100, 
+        currency: "INR",
+        name: "LibHub",
+        description: `Month Access - ${library.name}`,
+        image: "https://cdn-icons-png.flaticon.com/512/2232/2232688.png", // Library Icon
+        order_id: orderData.razorpayOrderId, 
+        
+        // C. Success Handler
+        handler: async function (response) {
+            try {
+                const verificationData = {
+                    razorpayOrderId: response.razorpay_order_id,
+                    razorpayPaymentId: response.razorpay_payment_id,
+                    razorpaySignature: response.razorpay_signature,
+                    userEmail: user.email
+                };
+
+                // D. Verify on Backend
+                await verifyPaymentAPI(verificationData);
+                
+                // E. Success!
+                setIsProcessing(false);
+                setStep('success');
+
+            } catch (verifyError) {
+                alert("Payment Verification Failed. Please contact support.");
+                console.error(verifyError);
+                setIsProcessing(false);
+            }
+        },
+        prefill: {
+            name: user.name || "Student",
+            email: user.email,
+            contact: "" 
+        },
+        theme: {
+            color: "#4F46E5" // Indigo-600 to match new UI
+        }
+      };
+
+      const rzp1 = new window.Razorpay(options);
+      rzp1.on('payment.failed', function (response){
+        alert("Payment Failed: " + response.error.description);
+        setIsProcessing(false);
+      });
+      rzp1.open();
+
+    } catch (error) {
+      console.error("Payment Initiation Failed:", error);
+      alert("Could not start payment. Please check your connection.");
+      setIsProcessing(false);
+    }
   };
 
-  // --- VIEW 3: SUCCESS / RECEIPT ---
-  if (step === 'success') {
+  // --- LOADING STATE ---
+  if (step === 'loading' || !library) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center animate-in zoom-in duration-300">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Booking Confirmed!</h2>
-          <p className="text-gray-500 mb-6">Your seat at <span className="font-bold">{library.name}</span> is reserved.</p>
-          
-          <div className="bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300 mb-6 text-sm">
-            <div className="flex justify-between mb-2"><span>Transaction ID:</span><span className="font-mono text-gray-700">PID_992837</span></div>
-            <div className="flex justify-between mb-2"><span>Date:</span><span>{new Date().toLocaleDateString()}</span></div>
-            <div className="flex justify-between font-bold text-lg pt-2 border-t border-gray-200"><span>Amount Paid:</span><span>₹{library.price - library.discount}</span></div>
-          </div>
-
-          <button onClick={() => navigate('/dashboard')} className="w-full bg-gray-900 text-white font-bold py-3 rounded-xl hover:bg-gray-800 transition-all">
-            Go to Dashboard
-          </button>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
+          <p className="text-gray-500 font-medium">Preparing your study space...</p>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen pt-20 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900 flex items-center justify-center font-sans">
-      <div className="max-w-6xl w-full bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px] transition-all duration-500">
-        
-        {/* --- LEFT SIDE: LOGIC (Login or Payment Methods) --- */}
-        <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center border-r border-gray-100 dark:border-gray-700 relative">
+  // --- SUCCESS STATE (Ticket View) ---
+  if (step === 'success') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden relative animate-in zoom-in duration-500">
+          {/* Confetti / Decoration Background */}
+          <div className="absolute top-0 left-0 w-full h-32 bg-green-500"></div>
           
-          {step === 'login' ? (
-            /* VIEW 1: LOGIN FORM */
-            <div className="animate-in fade-in slide-in-from-left-4 duration-500">
-              <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Student Login</h2>
-              <p className="text-gray-500 dark:text-gray-400 mb-8">Enter your details to unlock the <span className="text-green-600 font-bold">₹50 First-Time Discount</span>.</p>
-              
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
-                  <input 
-                    type="email" 
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
-                    placeholder="student@university.com" 
-                  />
-                </div>
-                <button 
-                  disabled={loading}
-                  className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/30 flex justify-center items-center"
-                >
-                  {loading ? "Verifying..." : "Verify & Continue →"}
-                </button>
-              </form>
+          <div className="relative pt-12 px-8 pb-8 text-center">
+            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg ring-4 ring-green-100">
+              <CheckCircle className="w-10 h-10 text-green-500" />
             </div>
-          ) : (
-            /* VIEW 2: PAYMENT METHOD SELECTION */
-            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-              <div className="flex items-center mb-6 cursor-pointer" onClick={() => setStep('login')}>
-                <span className="text-blue-500 text-sm font-bold">← Back</span>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Select Payment Method</h2>
-              
-              <div className="space-y-3">
-                <div className="p-4 border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-between cursor-pointer">
-                  <div className="flex items-center">
-                    <span className="w-4 h-4 rounded-full border-4 border-blue-600 mr-3"></span>
-                    <span className="font-bold text-gray-800 dark:text-white">UPI / QR Code</span>
-                  </div>
-                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold">FASTEST</span>
-                </div>
-                <div className="p-4 border border-gray-200 dark:border-gray-600 rounded-xl flex items-center opacity-60">
-                  <span className="w-4 h-4 rounded-full border border-gray-400 mr-3"></span>
-                  <span className="text-gray-800 dark:text-white">Credit / Debit Card</span>
-                </div>
-              </div>
+            
+            <h2 className="text-3xl font-extrabold text-gray-900 mb-2">You're In!</h2>
+            <p className="text-gray-500 mb-8">Your seat at <strong>{library.name}</strong> has been confirmed for the next 30 days.</p>
 
-              <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-xs text-gray-500 dark:text-gray-400">
-                Logged in as: <span className="font-bold text-gray-700 dark:text-gray-200">{email}</span>
-              </div>
+            {/* Ticket Stub */}
+            <div className="bg-gray-50 rounded-xl border border-dashed border-gray-300 p-6 mb-8 text-left relative">
+               {/* Cutout circles for ticket effect */}
+               <div className="absolute -left-3 top-1/2 w-6 h-6 bg-white border-r border-gray-300 rounded-full transform -translate-y-1/2"></div>
+               <div className="absolute -right-3 top-1/2 w-6 h-6 bg-white border-l border-gray-300 rounded-full transform -translate-y-1/2"></div>
+               
+               <div className="flex justify-between items-center mb-4">
+                 <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Library</span>
+                 <span className="text-sm font-bold text-gray-800">{library.name}</span>
+               </div>
+               <div className="flex justify-between items-center mb-4">
+                 <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Plan</span>
+                 <span className="text-sm font-bold text-indigo-600">Monthly Access</span>
+               </div>
+               <div className="flex justify-between items-center">
+                 <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Amount</span>
+                 <span className="text-lg font-extrabold text-gray-900">₹{priceDetails.finalPrice}</span>
+               </div>
             </div>
-          )}
+
+            <button 
+              onClick={() => navigate('/dashboard')} 
+              className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // --- MAIN SPLIT LAYOUT ---
+  return (
+    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8 font-sans flex items-center justify-center">
+      <div className="max-w-6xl w-full bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[650px]">
+        
+        {/* --- LEFT SIDE: THE EXPERIENCE (Visuals) --- */}
+        <div className="w-full md:w-5/12 relative bg-gray-900 text-white p-8 md:p-12 flex flex-col justify-between overflow-hidden">
+          {/* Background Image with Overlay */}
+          <div className="absolute inset-0 z-0">
+            <img src={library.image} alt="Library" className="w-full h-full object-cover opacity-60" />
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent"></div>
+          </div>
+
+          <div className="relative z-10">
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold border border-white/10 mb-6">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              Live Booking
+            </div>
+            <h1 className="text-4xl font-extrabold mb-2 leading-tight">{library.name}</h1>
+            <div className="flex items-center text-gray-300 text-sm">
+              <MapPin className="w-4 h-4 mr-1" />
+              {library.location}
+            </div>
+          </div>
+
+          <div className="relative z-10 space-y-6">
+             {/* Amenities Badges */}
+             <div className="flex flex-wrap gap-2">
+                {library.amenities.map((item, index) => (
+                    <span key={index} className="px-3 py-1.5 bg-black/30 backdrop-blur-sm rounded-lg text-xs font-medium border border-white/10 flex items-center gap-1.5">
+                        {item.includes('Wifi') && <Wifi className="w-3 h-3 text-cyan-400" />}
+                        {item.includes('AC') && <Zap className="w-3 h-3 text-yellow-400" />}
+                        {item.includes('Water') && <Coffee className="w-3 h-3 text-blue-400" />}
+                        {item}
+                    </span>
+                ))}
+             </div>
+
+             <div className="p-4 rounded-xl bg-white/10 backdrop-blur-md border border-white/10">
+                <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-1">Student Perks</p>
+                <p className="text-sm font-light">"Includes access to discussion rooms, quiet zones, and high-speed internet for uninterrupted study sessions."</p>
+             </div>
+          </div>
         </div>
 
-        {/* --- RIGHT SIDE: SUMMARY & PAY BUTTON --- */}
-        <div className="w-full md:w-1/2 bg-gray-50 dark:bg-gray-800/50 p-8 md:p-12 flex flex-col justify-center relative">
-          <div className="relative z-10">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Booking Summary</h3>
+        {/* --- RIGHT SIDE: THE ACTION (Form/Payment) --- */}
+        <div className="w-full md:w-7/12 p-8 md:p-12 bg-white flex flex-col justify-center">
             
-            <div className="bg-white dark:bg-gray-700 p-4 rounded-xl shadow-sm mb-6 flex gap-4 items-center">
-              <img src={library.image} className="w-20 h-20 rounded-lg object-cover" alt="Library" />
-              <div>
-                <h4 className="font-bold text-gray-800 dark:text-white">{library.name}</h4>
-                <p className="text-xs text-gray-500 dark:text-gray-300">{library.location}</p>
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded mt-1 inline-block">AC Seat</span>
-              </div>
+            {/* Header Steps */}
+            <div className="flex items-center gap-4 mb-8 text-sm font-medium">
+                <span className={`flex items-center gap-2 ${step === 'login' ? 'text-indigo-600' : 'text-gray-400'}`}>
+                    <span className="w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs border-current">1</span>
+                    Login
+                </span>
+                <div className="w-8 h-[1px] bg-gray-200"></div>
+                <span className={`flex items-center gap-2 ${step === 'payment' ? 'text-indigo-600' : 'text-gray-400'}`}>
+                    <span className="w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs border-current">2</span>
+                    Payment
+                </span>
             </div>
 
-            <div className="space-y-3 text-sm text-gray-600 dark:text-gray-300 mb-8 border-t border-gray-200 dark:border-gray-600 pt-4">
-              <div className="flex justify-between">
-                <span>Monthly Subscription</span>
-                <span className="font-medium">₹{library.price}</span>
-              </div>
-              
-              {/* Conditional Discount Display */}
-              <div className={`flex justify-between text-green-600 dark:text-green-400 transition-all duration-500 ${step === 'login' ? 'opacity-50 blur-[2px]' : 'opacity-100'}`}>
-                <span>First-Time User Discount</span>
-                <span className="font-medium">- ₹{library.discount}</span>
-              </div>
-              
-              <div className="flex justify-between font-bold text-lg text-gray-900 dark:text-white pt-2 border-t border-gray-200 dark:border-gray-600">
-                <span>Total to Pay</span>
-                <span>₹{step === 'login' ? library.price : (library.price - library.discount)}</span>
-              </div>
-            </div>
+            {step === 'login' ? (
+                /* LOGIN VIEW */
+                <div className="animate-in fade-in slide-in-from-right-8 duration-500 max-w-md mx-auto w-full">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Secure your spot.</h2>
+                    <p className="text-gray-500 mb-8">Login to continue with your booking.</p>
+                    
+                    <div className="space-y-4">
+                        <button 
+                            onClick={() => navigate('/login')}
+                            className="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-200"
+                        >
+                            Log in with Email <ArrowRight className="w-4 h-4" />
+                        </button>
+                        <p className="text-center text-sm text-gray-500 mt-4">
+                            Don't have an account? <span onClick={() => navigate('/signup')} className="text-indigo-600 font-bold cursor-pointer hover:underline">Sign up free</span>
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                /* PAYMENT VIEW */
+                <div className="animate-in fade-in slide-in-from-bottom-8 duration-500 max-w-md mx-auto w-full">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Order Summary</h2>
 
-            {/* THE PAY BUTTON - Only active in Step 2 */}
-            <button 
-              onClick={handlePayment}
-              disabled={step === 'login' || loading}
-              className={`w-full py-4 rounded-xl font-bold text-lg shadow-xl transition-all flex justify-center items-center ${
-                step === 'login' 
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                  : 'bg-green-600 hover:bg-green-700 text-white transform hover:scale-[1.02]'
-              }`}
-            >
-              {loading 
-                ? <span className="animate-pulse">Processing...</span> 
-                : step === 'login' ? "Login to Unlock Payment" : `Pay ₹${library.price - library.discount} via Razorpay`
-              }
-            </button>
+                    {/* Price Card */}
+                    <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 mb-6 space-y-3">
+                        <div className="flex justify-between items-center text-gray-600">
+                            <span>Monthly Subscription</span>
+                            <span className="font-medium">₹{priceDetails.basePrice}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-green-600 bg-green-50 px-3 py-1 rounded-lg border border-green-100">
+                            <span className="flex items-center gap-1.5 text-sm font-bold"><Zap className="w-3 h-3 fill-current" /> Student Discount</span>
+                            <span className="font-bold">- ₹{priceDetails.discount}</span>
+                        </div>
+                        <div className="border-t border-gray-200 pt-3 mt-2 flex justify-between items-center">
+                            <span className="text-lg font-bold text-gray-900">Total Payable</span>
+                            <span className="text-2xl font-extrabold text-indigo-600">₹{priceDetails.finalPrice}</span>
+                        </div>
+                    </div>
 
-            <div className="flex items-center gap-2 text-xs text-gray-400 mt-4 justify-center">
-              <span>🔒 Secure Payment via Razorpay (Test Mode)</span>
-            </div>
+                    <div className="mb-8">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Payment Method</h3>
+                        <div className="p-4 border-2 border-indigo-600 bg-indigo-50/50 rounded-xl flex items-center justify-between cursor-pointer shadow-sm relative overflow-hidden">
+                            <div className="absolute right-0 top-0 bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-bold">PREFERRED</div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                    <ShieldCheck className="w-5 h-5 text-indigo-600" />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-gray-900 text-sm">Razorpay Secure</p>
+                                    <p className="text-xs text-gray-500">UPI, Cards, NetBanking</p>
+                                </div>
+                            </div>
+                            <div className="w-5 h-5 rounded-full border-[5px] border-indigo-600"></div>
+                        </div>
+                    </div>
 
-          </div>
+                    <button 
+                        onClick={handlePayment}
+                        disabled={isProcessing}
+                        className="w-full py-4 bg-gray-900 hover:bg-black text-white font-bold rounded-xl transition-all shadow-xl hover:shadow-2xl hover:scale-[1.01] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                        {isProcessing ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" /> Processing...
+                            </>
+                        ) : (
+                            `Pay ₹${priceDetails.finalPrice} & Book`
+                        )}
+                    </button>
+
+                    <p className="text-center text-xs text-gray-400 mt-4 flex items-center justify-center gap-1">
+                        <ShieldCheck className="w-3 h-3" /> 100% Secure Transaction via Razorpay
+                    </p>
+                </div>
+            )}
         </div>
 
       </div>

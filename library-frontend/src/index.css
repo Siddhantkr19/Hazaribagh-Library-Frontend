@@ -1,47 +1,126 @@
 @import "tailwindcss";
 
-@keyframes fall {
-  0% {
-    transform: translateY(-10vh) rotate(0deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(110vh) rotate(360deg);
-    opacity: 0;
-  }
+/* =========================================
+   2. ROOT RESET (CRITICAL FIX)
+   ========================================= */
+/* We reset #root to allow full-width backgrounds for the Booking Page.
+   The original padding/text-align will break the modern UI forms. */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 }
 
-.animate-fall {
-  animation: fall linear infinite;
-}
-@keyframes scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+#root {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0; /* Changed from 2rem to 0 to allow full screen */
+  text-align: left; /* Changed from center to fix form inputs alignment */
 }
 
-.animate-scroll {
+body {
+  margin: 0;
   display: flex;
-  width: max-content; /* Forces the container to be as wide as the cards */
-  animation: scroll 30s linear infinite; /* Adjust '30s' to make it faster/slower */
+  place-items: flex-start; /* Aligns content to top */
+  min-width: 320px;
+  min-height: 100vh;
 }
 
-/* Pause the animation when user hovers over the cards */
-.animate-scroll:hover {
-  animation-play-state: paused;
+/* =========================================
+   3. YOUR EXISTING STYLES (PRESERVED)
+   ========================================= */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
 }
-/* ADD THIS AT THE BOTTOM OF src/index.css */
-
-@keyframes scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-33.33%); } /* Moves 1/3rd because we have 3 sets of cards */
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+/* =========================================
+   4. NEW ANIMATIONS (FOR BOOKING PAGE)
+   ========================================= */
+@layer utilities {
+  .animate-in {
+    animation-duration: 0.6s;
+    animation-fill-mode: both;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); /* Smooth ease-out */
+  }
+  
+  .fade-in {
+    animation-name: fadeIn;
+  }
+  
+  .zoom-in {
+    animation-name: zoomIn;
+  }
+  
+  .slide-in-from-bottom-8 {
+    animation-name: slideUp;
+  }
+  
+  .slide-in-from-right-8 {
+    animation-name: slideRight;
+  }
+  
+  .slide-in-from-left-4 {
+    animation-name: slideLeft;
+  }
+
+  /* Keyframes */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes zoomIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(2rem); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes slideRight {
+    from { opacity: 0; transform: translateX(2rem); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes slideLeft {
+    from { opacity: 0; transform: translateX(-1rem); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+}
 .animate-scroll {
   display: flex; /* Ensures horizontal layout */
   width: max-content; /* Prevents wrapping */

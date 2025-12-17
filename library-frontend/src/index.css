@@ -9,8 +9,8 @@
 #root {
   width: 100%;
   margin: 0 auto;
-  padding: 0; /* Allows full width */
-  text-align: left; /* Fixes form alignment */
+  padding: 0;
+  text-align: left; 
 }
 
 body {
@@ -21,9 +21,7 @@ body {
   min-height: 100vh;
 }
 
-/* =========================================
-   2. EXISTING STYLES (PRESERVED)
-   ========================================= */
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -56,9 +54,9 @@ body {
   color: #888;
 }
 
-/* =========================================
-   3. UTILITY ANIMATIONS (Merged & Fixed)
-   ========================================= */
+
+   /* 3. UTILITY ANIMATIONS (Merged & Fixed) */
+   
 @layer utilities {
   /* --- Entrance Animations --- */
   .animate-in {
@@ -93,7 +91,7 @@ body {
     animation: subtle-spin 3s linear infinite;
   }
 
-  /* ================= KEYFRAMES ================= */
+  
   
   @keyframes fadeIn {
     from { opacity: 0; }
@@ -138,7 +136,7 @@ body {
     100% {
       top: 110%;
       opacity: 0;
-      /* Ensure --drift is defined in inline styles in React */
+      
       transform: translateX(var(--drift, 0px)) rotateZ(360deg) scale(1);
     }
   }

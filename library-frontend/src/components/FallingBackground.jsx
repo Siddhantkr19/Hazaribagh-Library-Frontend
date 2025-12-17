@@ -28,11 +28,19 @@ const FallingBackground = () => {
       const types = Object.keys(icons);
       const type = types[Math.floor(Math.random() * types.length)];
       
+      // Random drift (side-to-side movement) for natural falling effect
+      const drift = Math.random() * 100 - 50; // -50px to +50px
+      
+      // Random delays for staggered effect
+      const delay = Math.random() * 10; // 0-10 seconds
+      
+      // Random starting position
+      const leftPosition = Math.random() * 100;
+      
       const style = {
-        left: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 5}s`,
-        animationDuration: `${Math.random() * 15 + 15}s`,
-        transform: `scale(${Math.random() * 0.5 + 0.8})`, 
+        left: `${leftPosition}%`,
+        animationDelay: `${delay}s`,
+        '--drift': `${drift}px`, // CSS variable for drift
       };
       
       // Using '300' shade to ensure they are bright/light enough on dark background
@@ -44,21 +52,19 @@ const FallingBackground = () => {
         'text-violet-300'   // Purple
       ];
       
-      
       const colorClass = colors[Math.floor(Math.random() * colors.length)];
 
-      
-      return { id: i, type, style, colorClass: `${colorClass} opacity-60` };
+      return { id: i, type, style, colorClass: `${colorClass}` };
     });
     setItems(newItems);
   }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-1">
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
       {items.map((item) => (
         <div
           key={item.id}
-          className={`absolute top-[-10%] animate-fall ${item.colorClass}`}
+          className={`absolute top-[-10%] animate-fall animate-spin-slow ${item.colorClass}`}
           style={item.style}
         >
           {icons[item.type]}

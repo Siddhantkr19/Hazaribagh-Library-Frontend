@@ -285,6 +285,21 @@ const Booking = () => {
                         </div>
                     </div>
 
+                    {/* ================= ADD THIS BLOCK HERE ================= */}
+                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-blue-500 text-white rounded-lg">
+                            {/* Armchair Icon SVG */}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3"/><path d="M3 16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H7v-2a2 2 0 0 0-4 0Z"/><path d="M5 18v2"/><path d="M19 18v2"/></svg>
+                        </div>
+                        <div>
+                            {/* Updated colors to be visible on white background */}
+                            <p className="text-sm font-bold text-gray-900">Seat Assignment</p>
+                            <p className="text-xs text-blue-700">
+                                System will automatically assign the best available seat (e.g., Seat-1, Seat-2) instantly after payment.
+                            </p>
+                        </div>
+                    </div>
+
                     <div className="mb-8">
                         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Payment Method</h3>
                         <div className="p-4 border-2 border-indigo-600 bg-indigo-50/50 rounded-xl flex items-center justify-between cursor-pointer shadow-sm relative overflow-hidden">

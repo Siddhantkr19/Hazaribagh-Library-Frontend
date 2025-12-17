@@ -7,13 +7,16 @@ const Login = () => {
   const navigate = useNavigate();
   const { login , user } = useAuth(); 
 
-  // --- [FIX] AUTO-REDIRECT IF LOGGED IN ---
-  useEffect(() => {
+useEffect(() => {
     if (user) {
-      navigate('/dashboard'); // If user exists, go to Dashboard instantly
+      // Check role and redirect accordingly
+      if (user.role === 'ADMIN' || user.role === 'Admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     }
   }, [user, navigate]);
-  // ----------------------------------------
 
   // 1. STATE
   const [email, setEmail] = useState('');
@@ -29,44 +32,47 @@ const [showPassword, setShowPassword] = useState(false);
     }
   };
 
-  // 3. LOGIN HANDLER
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccessMessage('');
+ // 3. LOGIN HANDLER
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccessMessage('');
 
-    try {
-      // --- CHANGE START ---
-      // 1. Use .post() instead of .get()
-      // 2. Pass the data { email, password } as the second argument
-      const response = await api.post('/auth/login', { 
+    try {
+      const response = await api.post('/auth/login', { 
           email: email, 
           password: password 
       });
-      // --- CHANGE END ---
-      
-      if (response.data) {
-        // Success! User found.
-          setSuccessMessage("Login Successful! Redirecting...");
-        login(response.data); // Save user to global context
-   
-       setTimeout(() => {
-          navigate('/dashboard'); 
-        }, 1000);
-      } 
+      
+      if (response.data) {
+        setSuccessMessage("Login Successful! Redirecting...");
+        login(response.data); // Save user to global context
+   
+        // --- INTELLIGENT ROUTING FIX ---
+        setTimeout(() => {
+          // Check the role from the response
+          const userRole = response.data.role; 
+          
+          if (userRole === 'ADMIN' || userRole === 'Admin') {
+            navigate('/admin'); // Send Admins here
+          } else {
+            navigate('/dashboard'); // Send Students here
+          }
+        }, 1000);
+        // -------------------------------
+      } 
 
-    } catch (err) {
-      console.error("Login Error:", err);
-      // Optional: Check specifically for 403 or 401 errors
+    } catch (err) {
+      console.error("Login Error:", err);
       if (err.response && err.response.status === 403) {
           setError("Invalid password or email.");
       } else {
-          setError("Login failed. Please try again.");
+          setError("Login failed. Please try again.");
       }
-      setLoading(false);
-    }
-  };
+      setLoading(false);
+    }
+  };
 
   return (
     <div 

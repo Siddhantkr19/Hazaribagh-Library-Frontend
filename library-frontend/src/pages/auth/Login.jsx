@@ -9,7 +9,7 @@ const Login = () => {
 
 useEffect(() => {
     if (user) {
-      // Check role and redirect accordingly
+     
       if (user.role === 'ADMIN' || user.role === 'Admin') {
         navigate('/admin');
       } else {
@@ -47,17 +47,16 @@ const [showPassword, setShowPassword] = useState(false);
       
       if (response.data) {
         setSuccessMessage("Login Successful! Redirecting...");
-        login(response.data); // Save user to global context
-   
-        // --- INTELLIGENT ROUTING FIX ---
+        login(response.data); 
+       --
         setTimeout(() => {
-          // Check the role from the response
+          
           const userRole = response.data.role; 
           
           if (userRole === 'ADMIN' || userRole === 'Admin') {
-            navigate('/admin'); // Send Admins here
+            navigate('/admin'); 
           } else {
-            navigate('/dashboard'); // Send Students here
+            navigate('/dashboard'); 
           }
         }, 1000);
         // -------------------------------
@@ -156,7 +155,7 @@ const [showPassword, setShowPassword] = useState(false);
                   )}
                 </button>
               </div>
-            {/* --- [NEW CODE START] INSERT THIS RIGHT AFTER THE PASSWORD DIV --- */}
+            
 <div className="flex justify-end mt-2">
     <Link 
       to="/forgot-password" 

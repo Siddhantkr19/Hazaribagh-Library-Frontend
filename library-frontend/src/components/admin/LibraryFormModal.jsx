@@ -58,8 +58,8 @@ const LibraryFormModal = ({ isOpen, onClose, editingLib, onSuccess }) => {
         await api.post('/libraries', payload);
         toast.success("New Library Added!");
       }
-      onSuccess(); // Refresh the list
-      onClose();   // Close modal
+      onSuccess();
+      onClose();   
     } catch (error) {
       console.error(error);
       toast.error("Failed to save library. Check console.");

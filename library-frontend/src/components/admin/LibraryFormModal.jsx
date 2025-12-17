@@ -15,17 +15,17 @@ const LibraryFormModal = ({ isOpen, onClose, editingLib, onSuccess }) => {
     amenities: []
   });
 
- // [FIX] Populate form when libraryToEdit changes
+
   useEffect(() => {
     if (libraryToEdit) {
-      // Convert arrays to comma-separated strings for the input fields
+     
       setFormData({
         ...libraryToEdit,
         amenities: Array.isArray(libraryToEdit.amenities) ? libraryToEdit.amenities.join(', ') : '',
         images: Array.isArray(libraryToEdit.images) ? libraryToEdit.images.join(', ') : ''
       });
     } else {
-      // Reset if Adding New
+     
       setFormData(initialState);
     }
   }, [libraryToEdit, isOpen]); // Runs whenever the modal opens or the target library changes

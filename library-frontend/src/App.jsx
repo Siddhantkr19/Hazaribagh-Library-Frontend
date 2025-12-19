@@ -17,7 +17,7 @@ import LibraryDetails from './pages/LibraryDetails';
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 
-// --- NEW BOOKING PAGES (Nested) ---
+// ---  BOOKING PAGES (Nested) ---
 import BookingLayout from './pages/Booking/BookingLayout';
 import StepEmail from './pages/Booking/StepEmail';
 import StepPayment from './pages/Booking/StepPayment';
@@ -61,7 +61,7 @@ function App() {
           <Route path="/libraries" element={<AllLibraries />} />
           <Route path="/libraries/:id" element={<LibraryDetails />} />
           
-          {/* --- NEW NESTED BOOKING FLOW --- */}
+          {/* ---  NESTED BOOKING FLOW --- */}
           <Route path="/book/:id" element={<BookingLayout />}>
              {/* Step 1: Default (Email Check) */}
              <Route index element={<StepEmail />} />          

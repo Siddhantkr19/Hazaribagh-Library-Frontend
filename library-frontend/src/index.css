@@ -1,5 +1,5 @@
 @import "tailwindcss";
-========================================= */
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -19,46 +19,59 @@ body {
   place-items: flex-start;
   min-width: 320px;
   min-height: 100vh;
+  background-color: #111827; /* Dark background default */
 }
 
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
-
-   /* 3. UTILITY ANIMATIONS (Merged & Fixed) */
-   
 @layer utilities {
-  /* --- Entrance Animations --- */
+  /* --- 1. INFINITE SCROLL (For Trending Libraries) --- */
+  .animate-scroll {
+    display: flex;
+    width: max-content;
+    animation: scroll 40s linear infinite;
+    will-change: transform;
+  }
+
+  .animate-scroll:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-33.33%); } /* Perfect loop for 3 sets of cards */
+  }
+
+  /* --- 2. FALLING BACKGROUND (Optimized) --- */
+  .animate-fall {
+    animation: animate-fall 20s linear infinite;
+    will-change: top, transform;
+  }
+
+  @keyframes animate-fall {
+    0% {
+      top: -10%;
+      opacity: 0;
+      transform: translateX(0);
+    }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% {
+      top: 110%;
+      opacity: 0;
+      transform: translateX(var(--drift, 0px));
+    }
+  }
+
+  /* --- 3. SPINNING ICONS (Layered with Fall) --- */
+  .animate-spin-slow {
+    animation: spin-slow 8s linear infinite;
+  }
+
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* --- 4. ENTRANCE EFFECTS --- */
   .animate-in {
     animation-duration: 0.6s;
     animation-fill-mode: both;
@@ -66,83 +79,15 @@ body {
   }
   
   .fade-in { animation-name: fadeIn; }
-  .zoom-in { animation-name: zoomIn; }
   .slide-in-from-bottom-8 { animation-name: slideUp; }
-  .slide-in-from-right-8 { animation-name: slideRight; }
-  .slide-in-from-left-4 { animation-name: slideLeft; }
 
-  /* --- Scroll Animation --- */
-  .animate-scroll {
-    display: flex;
-    width: max-content;
-    animation: scroll 40s linear infinite;
-  }
-  .animate-scroll:hover {
-    animation-play-state: paused;
-  }
-
-  /* --- Falling Background Animation --- */
-  .animate-fall {
-    animation: animate-fall 20s linear infinite;
-  }
-
-  /* --- Spinner --- */
-  .animate-spin-slow {
-    animation: subtle-spin 3s linear infinite;
-  }
-
-  
-  
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
   }
 
-  @keyframes zoomIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
   @keyframes slideUp {
     from { opacity: 0; transform: translateY(2rem); }
     to { opacity: 1; transform: translateY(0); }
-  }
-  
-  @keyframes slideRight {
-    from { opacity: 0; transform: translateX(2rem); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  @keyframes slideLeft {
-    from { opacity: 0; transform: translateX(-1rem); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  /* Added missing scroll keyframe */
-  @keyframes scroll {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-
-  @keyframes animate-fall {
-    0% {
-      top: -10%;
-      opacity: 0;
-      transform: translateX(0) rotateZ(0deg) scale(1);
-    }
-    10% { opacity: 0.6; }
-    50% { opacity: 0.6; }
-    90% { opacity: 0.3; }
-    100% {
-      top: 110%;
-      opacity: 0;
-      
-      transform: translateX(var(--drift, 0px)) rotateZ(360deg) scale(1);
-    }
-  }
-
-  @keyframes subtle-spin {
-    from { transform: rotateZ(0deg); }
-    to { transform: rotateZ(360deg); }
   }
 }

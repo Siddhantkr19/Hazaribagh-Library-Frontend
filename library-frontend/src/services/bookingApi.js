@@ -1,27 +1,44 @@
 import axios from 'axios';
 
-// Create Axios Instance
-const bookingApi = axios.create({
-  baseURL: 'http://localhost:8080/api/bookings', 
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true // [IMPORTANT] Needed to send Cookies (JWT) to backend
+// Base Axios Instance
+const api = axios.create({
+  baseURL: 'http://localhost:8080/api', // Changed to base API
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true
 });
 
-// 1. Create Order (Step 1 of Flow)
+// --- BOOKING ENDPOINTS ---
 export const createOrderAPI = async (userEmail, libraryId) => {
-  // We send the email and library ID as query params/body
-  const response = await bookingApi.post(`/create-order?userEmail=${userEmail}`, {
+  const response = await api.post(`/bookings/create-order?userEmail=${userEmail}`, {
     libraryId: libraryId
   });
-  return response.data; // Returns orderId, amount, key, etc.
+  return response.data;
 };
 
-// 2. Verify Payment (Step 2 of Flow)
 export const verifyPaymentAPI = async (verificationData) => {
-  const response = await bookingApi.post('/verify-payment', verificationData);
-  return response.data; // Returns confirmed booking
+  const response = await api.post('/bookings/verify-payment', verificationData);
+  return response.data;
 };
 
-export default bookingApi;
+// --- NEW: FETCH LIBRARY DETAILS ---
+export const getLibraryById = async (id) => {
+  // Assuming your backend has this endpoint. If not, use the logic from AllLibraries to findByID
+  const response = await api.get(`/libraries/${id}`); 
+  // If your backend only has /libraries, you might need to fetch all and find one, but getting by ID is better.
+  return response.data;
+};
+
+// --- NEW: CHECK IF USER EXISTS ---
+export const checkUserByEmail = async (email) => {
+  // You need to create this endpoint in your AuthController on Backend
+  // Example: @GetMapping("/check-email") public boolean checkEmail(@RequestParam String email) ...
+  try {
+    const response = await api.get(`/auth/check-email?email=${email}`);
+    return response.data; // Should return { exists: true/false } or just boolean
+  } catch (error) {
+    console.error("Check email failed", error);
+    return false; // Assume false or handle error
+  }
+};
+
+export default api;

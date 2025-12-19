@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'; 
 import LibraryCard from '../components/LibraryCard';
-// import Navbar from '../components/Navbar'; // Uncomment if you use it inside
-
+// import Navbar from '../components/Navbar'; // Uncomment if i use it inside
+i
 const AllLibraries = () => {
   // 1. STATE MANAGEMENT
-  const [libraries, setLibraries] = useState([]);       // Stores RAW data from backend
-  const [filteredData, setFilteredData] = useState([]); // Stores FILTERED data to show
+  const [libraries, setLibraries] = useState([]);       
+  const [filteredData, setFilteredData] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Search & Filter State
-  const [searchQuery, setSearchQuery] = useState('');   // User text input
-  const [activeFilter, setActiveFilter] = useState('All'); // 'All', 'Matwari', 'Korrah', 'Under 400'
-
+  const [searchQuery, setSearchQuery] = useState('');   
+  const [activeFilter, setActiveFilter] = useState('All'); 
   // 2. FETCH DATA (Run once on mount)
   useEffect(() => {
     const fetchLibraries = async () => {
@@ -35,7 +34,7 @@ const AllLibraries = () => {
         }));
 
         setLibraries(formattedData);
-        setFilteredData(formattedData); // Initially, show everything
+        setFilteredData(formattedData); 
         setLoading(false);
       } catch (err) {
         console.error("Error fetching libraries:", err);
@@ -73,7 +72,7 @@ const AllLibraries = () => {
 
     setFilteredData(result);
 
-  }, [searchQuery, activeFilter, libraries]); // Re-run when these change
+  }, [searchQuery, activeFilter, libraries]);
 
   // --- HELPER TO RENDER FILTER BUTTONS ---
   const FilterButton = ({ label, value }) => (

@@ -1,33 +1,52 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-// Receive the "onSearch" prop from the parent (Home.jsx)
-const LibrarySearch = ({ onSearch }) => {
+// Receive "setLoading" to trigger Skeletons in Home.jsx
+const LibrarySearch = ({ onSearch, setLoading }) => {
   const [activeTab, setActiveTab] = useState('location');
   const [query, setQuery] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [internalLoading, setInternalLoading] = useState(false); // Local loading for the button
 
-  const handleSearch = async () => {
+  // 1. Define lists for both tabs
+  const popularLocations = ['Matwari', 'Korrah', 'Babu Gaon'];
+  const popularPrices = ['400', '500', '600'];
+
+  // 2. Main Search Handler
+  const handleSearch = async (overrideQuery = null) => {
+    const searchTerm = overrideQuery !== null ? overrideQuery : query;
+
     // Prevent empty searches
-    if (!query.trim()) return;
+    if (!searchTerm || !searchTerm.trim()) return;
     
-    setLoading(true);
+    // --- SPEED FIX: Tell Home to show Skeletons immediately ---
+    if (setLoading) setLoading(true); 
+    setInternalLoading(true);
+
     try {
-      // Call your existing Backend API
-      const response = await axios.get(`http://localhost:8080/api/libraries/search?query=${query}`);
+      // Call Backend API
+      const response = await axios.get(`http://localhost:8080/api/libraries/search?query=${searchTerm}`);
       
-      // Pass the raw data back to Home.jsx
+      // Pass data to Home (Home will handle turning off the Skeletons)
       onSearch(response.data); 
       
     } catch (error) {
       console.error("Search failed:", error);
       alert("Search failed. Please try again.");
+      
+      // If error, we must manually turn off Skeletons
+      if (setLoading) setLoading(false);
     } finally {
-      setLoading(false);
+      // Always stop the button spinner
+      setInternalLoading(false);
     }
   };
 
-  // Allow searching by pressing "Enter"
+  // 3. Helper for Quick Clicks (Popular Tags)
+  const handleQuickClick = (value) => {
+    setQuery(value);       
+    handleSearch(value); // Search immediately
+  };
+
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') handleSearch();
   };
@@ -38,7 +57,7 @@ const LibrarySearch = ({ onSearch }) => {
       {/* Tabs */}
       <div className="flex space-x-2 p-1 mb-2">
         <button 
-          onClick={() => setActiveTab('location')}
+          onClick={() => { setActiveTab('location'); setQuery(''); }}
           className={`flex-1 py-2 px-4 rounded-xl text-sm font-bold transition-all ${
             activeTab === 'location' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-300 hover:bg-white/5 hover:text-white'
           }`}
@@ -46,7 +65,7 @@ const LibrarySearch = ({ onSearch }) => {
           By Location
         </button>
         <button 
-          onClick={() => setActiveTab('budget')}
+          onClick={() => { setActiveTab('budget'); setQuery(''); }}
           className={`flex-1 py-2 px-4 rounded-xl text-sm font-bold transition-all ${
             activeTab === 'budget' ? 'bg-emerald-600 text-white shadow-lg' : 'text-gray-300 hover:bg-white/5 hover:text-white'
           }`}
@@ -73,25 +92,28 @@ const LibrarySearch = ({ onSearch }) => {
         />
 
         <button 
-            onClick={handleSearch}
-            disabled={loading}
-            className="hidden sm:block m-1 px-8 py-3 bg-blue-700 text-white font-bold rounded-lg hover:bg-blue-800 transition-colors disabled:bg-gray-400"
+            onClick={() => handleSearch()}
+            disabled={internalLoading}
+            className={`hidden sm:block m-1 px-8 py-3 text-white font-bold rounded-lg transition-colors disabled:bg-gray-400 ${
+                activeTab === 'budget' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-blue-700 hover:bg-blue-800'
+            }`}
         >
-          {loading ? "..." : "Search"}
+          {internalLoading ? "..." : "Search"}
         </button>
       </div>
 
-      {/* Quick Filters - Click to Auto-Search */}
+      {/* 4. Quick Filters */}
       <div className="mt-3 flex flex-wrap gap-2 justify-center sm:justify-start px-2">
-        <span className=" text-gray-400 font-medium uppercase tracking-wider py-1">Popular:</span>
-        {['Matwari', 'Korrah', 'Babu Gaon'].map((loc) => (
+        <span className="text-gray-400 font-medium uppercase tracking-wider py-1">Popular:</span>
+        
+        {/* Dynamic List Mapping */}
+        {(activeTab === 'location' ? popularLocations : popularPrices).map((item) => (
           <button 
-            key={loc} 
-            // When clicked, fill query and trigger search
-            onClick={() => { setQuery(loc); handleSearch(); }} 
+            key={item} 
+            onClick={() => handleQuickClick(item)} 
             className="px-3 py-1 text-xs font-semibold rounded-full bg-white/10 text-white border border-white/10 hover:bg-white/20 transition-all"
           >
-            {loc}
+            {activeTab === 'budget' ? `₹${item}` : item}
           </button>
         ))}
       </div>

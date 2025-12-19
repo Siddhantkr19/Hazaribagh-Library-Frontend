@@ -33,6 +33,21 @@ const Home = () => {
     "from-fuchsia-300 to-violet-400",
     "from-red-400 to-orange-400"
   ];
+
+const SkeletonCard = () => (
+  <div className="bg-gray-800/50 rounded-xl overflow-hidden border border-white/5 shadow-xl">
+    <div className="h-48 bg-gray-700 animate-pulse"></div> {/* Image Placeholder */}
+    <div className="p-5 space-y-3">
+      <div className="h-6 bg-gray-700 rounded w-3/4 animate-pulse"></div> {/* Title */}
+      <div className="h-4 bg-gray-700 rounded w-1/2 animate-pulse"></div> {/* Location */}
+      <div className="flex justify-between pt-4">
+        <div className="h-8 bg-gray-700 rounded w-20 animate-pulse"></div>
+        <div className="h-8 bg-gray-700 rounded w-20 animate-pulse"></div>
+      </div>
+    </div>
+  </div>
+);
+const [isSearching, setIsSearching] = useState(false);
  const currentGradient = gradients[loopNum % gradients.length];
   useEffect(() => {
     const handleTyping = () => {
@@ -81,12 +96,13 @@ const Home = () => {
   }, []);
 
 
- // --- 3. SEARCH HANDLER (Populates Search Results Only) ---
+ // --- UPDATED SEARCH HANDLER ---
   const handleSearchResults = (data) => {
     const formattedData = mapBackendDataToFrontend(data);
     setSearchResults(formattedData);
+    setIsSearching(false); // Stop loading
     
-    // Smooth scroll to the results section
+    // Scroll to results
     setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
@@ -149,46 +165,56 @@ const Home = () => {
 
 
 
-      {/* ================= SECTION 2: SEARCH RESULTS (CONDITIONAL) ================= */}
-      {/* This section appears ONLY when searchResults is not null */}
-      
-      {searchResults && (
+     {/* ================= SECTION 2: SEARCH RESULTS ================= */}
+      {/* Logic: Show if we have results OR if we are currently searching */}
+      {(searchResults || isSearching) && (
         <div ref={resultsRef} className="relative z-20 py-12 bg-gray-900/95 border-y border-white/10 backdrop-blur-lg">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
-                {/* Header Row */}
+                {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <div>
                         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                             <span className="text-blue-500">🔍</span> Search Results
                         </h2>
-                        <p className="text-gray-400 text-sm mt-1">
-                            Found <span className="text-white font-bold">{searchResults.length}</span> libraries matching your criteria.
-                        </p>
+                        {/* Only show count if we are NOT loading */}
+                        {!isSearching && searchResults && (
+                            <p className="text-gray-400 text-sm mt-1">
+                                Found <span className="text-white font-bold">{searchResults.length}</span> libraries.
+                            </p>
+                        )}
                     </div>
-                    <button 
-                        onClick={clearSearch}
-                        className="px-4 py-2 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white rounded-lg text-sm font-bold border border-red-500/30 transition-all"
-                    >
-                        ✕ Clear Search
-                    </button>
+                    
+                    {/* Only show Clear button if we have results and not loading */}
+                    {!isSearching && (
+                         <button onClick={clearSearch} className="px-4 py-2 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white rounded-lg text-sm font-bold border border-red-500/30 transition-all">✕ Clear Search</button>
+                    )}
                 </div>
 
-                {/* Results Grid */}
-                {searchResults.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {searchResults.map((lib) => (
+                {/* Results Grid - Handles Loading State */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {isSearching ? (
+                        // 1. SHOW SKELETONS IF LOADING
+                        <>
+                            <SkeletonCard />
+                            <SkeletonCard />
+                            <SkeletonCard />
+                        </>
+                    ) : searchResults && searchResults.length > 0 ? (
+                        // 2. SHOW REAL CARDS IF DATA EXISTS
+                        searchResults.map((lib) => (
                             <div key={`search-${lib.id}`} className="transform hover:scale-[1.02] transition-transform duration-300">
                                 <LibraryCard library={lib} />
                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-center py-10 bg-white/5 rounded-2xl border border-dashed border-white/20">
-                        <p className="text-xl text-gray-400">No libraries found.</p>
-                        <p className="text-sm text-gray-500 mt-2">Try searching for "Matwari", "Korrah" or a different price.</p>
-                    </div>
-                )}
+                        ))
+                    ) : (
+                        // 3. SHOW EMPTY STATE
+                        <div className="col-span-3 text-center py-10 bg-white/5 rounded-2xl border border-dashed border-white/20">
+                            <p className="text-xl text-gray-400">No libraries found.</p>
+                            <p className="text-sm text-gray-500 mt-2">Try searching for "Matwari", "Korrah" or a different price.</p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
       )}

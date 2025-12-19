@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Outlet, useNavigate } from 'react-router-dom';
-import { getLibraryById } from '../../services/bookingApi'; // Adjust path as needed
+import { getLibraryById } from '../../services/bookingApi';
 import { MapPin, Wifi, Zap, Coffee, Loader2 } from 'lucide-react';
 
 const BookingLayout = () => {

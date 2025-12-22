@@ -1,9 +1,21 @@
 @import "tailwindcss";
 
+/* ✅ CRITICAL FIX FROM DOCS: Enable Class-Based Dark Mode */
+/* This tells Tailwind: "Activate dark mode utilities whenever the .dark class is present" */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  
+  /* Scrollbar follows color scheme */
+  color-scheme: light; 
+}
+
+/* Switch scrollbar to dark when .dark class exists */
+.dark {
+  color-scheme: dark;
 }
 
 #root {
@@ -13,15 +25,25 @@
   text-align: left; 
 }
 
+/* GLOBAL BODY STYLES */
 body {
   margin: 0;
-  display: flex;
-  place-items: flex-start;
+  display: block;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #111827; /* Dark background default */
+  
+  /* 1. Default State (Light Mode) */
+  /* We use @apply so Tailwind knows these colors */
+  @apply bg-gray-50 text-gray-900;
+  
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* 2. Dark Mode State */
+/* Because of the @custom-variant above, this works automatically with your toggle */
+.dark body {
+  @apply bg-gray-900 text-white;
+}
 @layer utilities {
   /* --- 1. INFINITE SCROLL (For Trending Libraries) --- */
   .animate-scroll {

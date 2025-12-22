@@ -41,6 +41,33 @@ const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null); // Clear previous errors
+
+    // --- 1. Validate Name ---
+    if (formData.name.trim().length < 3) {
+      setError("Name must be at least 3 characters long.");
+      return;
+    }
+
+    // --- 2. Validate Phone (Numeric & 10 digits) ---
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      setError("Phone number must be exactly 10 digits and numeric.");
+      return;
+    }
+
+    // --- 3. Validate Password ---
+    // At least 1 digit, 1 alphabet, 1 special char, and length > 3 (assuming >3 based on "greater than the digit" logic, usually >6 or >8 is standard)
+    // Regex explanation:
+    // (?=.*[A-Za-z]) -> At least one alphabet
+    // (?=.*\d)       -> At least one digit
+    // (?=.*[@$!%*#?&]) -> At least one special symbol
+    // .{4,}          -> Length greater than 3 (so 4 or more)
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{7,}$/;
+    if (!passwordRegex.test(formData.password)) {
+      setError("Password must be 8+ chars with 1 letter, 1 number, and 1 symbol.");
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match!");
@@ -75,7 +102,7 @@ const [showPassword, setShowPassword] = useState(false);
     <div 
       id="auth-overlay" // ID for detecting clicks
       onClick={handleOverlayClick}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-900 py-10 cursor-pointer" // Add cursor-pointer to indicate clickable background
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-100 via-purple-50 to-white dark:bg-gray-900 py-10 cursor-pointer transition-colors duration-300"
     >
       
       {/* BACKGROUND */}
@@ -133,7 +160,7 @@ const [showPassword, setShowPassword] = useState(false);
                     onChange={handleChange}
                     type="text" 
                     required
-                    className="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-600 text-white focus:ring-2 focus:ring-blue-500 outline-none" 
+                    className="w-full px-4 py-3 rounded-lg bg-gray-200 dark:bg-gray-800/50 border border-gray-400 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
                     placeholder="Rahul Kumar" 
                   />
                 </div>
@@ -148,8 +175,7 @@ const [showPassword, setShowPassword] = useState(false);
                       onChange={handleChange}
                       type="email" 
                       required
-                      className="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-600 text-white focus:ring-2 focus:ring-blue-500 outline-none" 
-                      placeholder="rahul@gmail.com" 
+                      className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-800/50 border border-purple-300 dark:border-gray-600 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none shadow-sm" 
                     />
                   </div>
                   <div>
@@ -171,7 +197,7 @@ const [showPassword, setShowPassword] = useState(false);
                 <div className="relative">
                   <label className="block text-xs font-medium text-gray-300 mb-1">Password</label>
                   <div className="relative">
-                    <input name="password" value={formData.password} onChange={handleChange} type={showPassword ? "text" : "password"} required className="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-600 text-white focus:ring-2 focus:ring-blue-500 outline-none pr-10" placeholder="Create strong password" />
+                    <input name="password" value={formData.password} onChange={handleChange} type={showPassword ? "text" : "password"} required className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-800/50 border border-purple-300 dark:border-gray-600 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none pr-10 shadow-sm" placeholder="Create strong password" />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none">
                       {showPassword ? (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
@@ -186,7 +212,7 @@ const [showPassword, setShowPassword] = useState(false);
                 <div className="relative">
                   <label className="block text-xs font-medium text-gray-300 mb-1">Confirm Password</label>
                   <div className="relative">
-                    <input name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} type={showPassword? "text" : "password"} required className="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-600 text-white focus:ring-2 focus:ring-blue-500 outline-none pr-10" placeholder="Repeat password" />
+                    <input name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} type={showPassword? "text" : "password"} required className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-800/50 border border-purple-300 dark:border-gray-600 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none pr-10 shadow-sm" placeholder="Repeat password" />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none">
                       {showPassword ? (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>

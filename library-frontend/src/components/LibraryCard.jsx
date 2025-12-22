@@ -27,10 +27,10 @@ const LibraryCard = ({ library }) => {
     <div 
       onClick={() => navigate(`/libraries/${id}`)}
       // Outer Container (Gradient Border)
-      className="group relative h-full w-full bg-gray-900/60 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-2 cursor-pointer"
+      className="group relative h-full w-full bg-white dark:bg-gray-900/60 backdrop-blur-xl border border-blue-200 dark:border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-400/30 dark:hover:shadow-blue-500/10 hover:-translate-y-2 cursor-pointer"
     >
       {/* FIX 1: Removed the self-closing '/' before the >. Now this div wraps the content. */}
-      <div className="relative w-full h-full bg-gray-900/95 backdrop-blur-xl rounded-2xl overflow-hidden flex flex-col">
+      <div className="relative w-full h-full bg-white dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl overflow-hidden flex flex-col">
       
         {/* --- Image Section --- */}
         <div className="relative h-48 flex-shrink-0 overflow-hidden">

@@ -71,7 +71,7 @@ const StepPayment = () => {
             <span className="text-xs text-green-400 bg-green-500/10 px-2 py-1 rounded border border-green-500/20">Saved ₹{discount}</span>
         </div>
 
-        <div className="bg-gray-800/50 rounded-2xl p-5 border border-white/5 space-y-4 mb-6">
+        <div className="bg-gradient-to-r from-blue-100 to-purple-100 dark:bg-gray-800/50 rounded-2xl p-5 border border-blue-300 dark:border-white/5 space-y-4 mb-6 shadow-sm">
             <div className="flex justify-between text-gray-400 text-sm">
                 <span>Base Price</span>
                 <span className="line-through">₹{basePrice}</span>

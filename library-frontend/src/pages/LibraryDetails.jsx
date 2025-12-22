@@ -38,7 +38,7 @@ const LibraryDetails = () => {
     : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop";
 
   return (
-    <div className="min-h-screen pt-28 pb-12 px-4 sm:px-6 lg:px-8  bg-gray-900 dark:bg-gray-900">
+    <div className="min-h-screen pt-28 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-blue-50 to-white dark:bg-gray-900 transition-colors duration-300">
       
       <div className="relative z-10 max-w-6xl mx-auto">
         
@@ -74,7 +74,7 @@ const LibraryDetails = () => {
           </div>
 
           {/* RIGHT COLUMN: Details */}
-          <div className="bg-gray-800/50 backdrop-blur-xl p-8 rounded-3xl border border-gray-700 shadow-xl">
+          <div className="bg-gradient-to-br from-white to-blue-50 dark:bg-gray-800/50 backdrop-blur-xl p-8 rounded-3xl border border-blue-200 dark:border-gray-700 shadow-xl shadow-blue-100/50 dark:shadow-none">
             
             <h1 className="text-4xl font-extrabold text-white mb-2">{library.name}</h1>
             <p className="text-gray-400 text-lg mb-6 flex items-center gap-2">
@@ -82,7 +82,7 @@ const LibraryDetails = () => {
             </p>
 
             {/* Price Card */}
-            <div className="bg-gray-900/80 rounded-2xl p-6 mb-8 border border-gray-700 flex justify-between items-center">
+            <div className="bg-gradient-to-r from-blue-100 to-purple-100 dark:bg-gray-900/80 rounded-2xl p-6 mb-8 border border-blue-300 dark:border-gray-700 flex justify-between items-center">
                 <div>
                     <p className="text-gray-400 text-sm line-through">₹{library.originalPrice}</p>
                     <p className="text-3xl font-bold text-green-400">₹{library.offerPrice}<span className="text-sm text-gray-400">/mo</span></p>

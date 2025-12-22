@@ -32,20 +32,20 @@ const BookingLayout = () => {
 
   if (!library) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-violet-100 to-blue-50 dark:bg-gray-900 flex items-center justify-center transition-colors duration-300">
         <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-violet-100 to-blue-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative overflow-hidden transition-colors duration-300">
       
       {/* Background Blobs */}
       <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/20 rounded-full blur-[100px]"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-600/20 rounded-full blur-[100px]"></div>
 
-      <div className="relative z-10 max-w-5xl w-full bg-gray-800/50 backdrop-blur-xl border border-white/10 rounded-[2rem] shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+      <div className="relative z-10 max-w-5xl w-full bg-gradient-to-br from-white to-blue-50 dark:bg-gray-800/50 backdrop-blur-xl border border-blue-200 dark:border-white/10 rounded-[2rem] shadow-2xl shadow-blue-300/30 dark:shadow-none overflow-hidden flex flex-col md:flex-row min-h-[600px]">
         
         {/* === LEFT SIDE: STATIC VISUALS === */}
         <div className="w-full md:w-1/2 relative h-64 md:h-auto">
@@ -73,7 +73,7 @@ const BookingLayout = () => {
         </div>
 
         {/* === RIGHT SIDE: DYNAMIC STEPS (OUTLET) === */}
-        <div className="w-full md:w-1/2 p-8 md:p-10 flex flex-col justify-center bg-gray-900/40">
+        <div className="w-full md:w-1/2 p-8 md:p-10 flex flex-col justify-center bg-gradient-to-b from-blue-100 to-blue-50 dark:bg-gray-900/40">
             {/* The Outlet renders StepEmail, StepPayment, or StepSuccess based on route */}
             <Outlet context={{ library }} />
         </div>

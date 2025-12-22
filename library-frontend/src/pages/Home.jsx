@@ -35,14 +35,14 @@ const Home = () => {
   ];
 
 const SkeletonCard = () => (
-  <div className="bg-gray-800/50 rounded-xl overflow-hidden border border-white/5 shadow-xl">
-    <div className="h-48 bg-gray-700 animate-pulse"></div> {/* Image Placeholder */}
+  <div className="bg-gray-200 dark:bg-gray-800/50 rounded-xl overflow-hidden border border-gray-300 dark:border-white/5 shadow-xl">
+    <div className="h-48 bg-gray-300 dark:bg-gray-700 animate-pulse"></div> {/* Image Placeholder */}
     <div className="p-5 space-y-3">
-      <div className="h-6 bg-gray-700 rounded w-3/4 animate-pulse"></div> {/* Title */}
-      <div className="h-4 bg-gray-700 rounded w-1/2 animate-pulse"></div> {/* Location */}
+      <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div> {/* Title */}
+      <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2 animate-pulse"></div> {/* Location */}
       <div className="flex justify-between pt-4">
-        <div className="h-8 bg-gray-700 rounded w-20 animate-pulse"></div>
-        <div className="h-8 bg-gray-700 rounded w-20 animate-pulse"></div>
+        <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded w-20 animate-pulse"></div>
+        <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded w-20 animate-pulse"></div>
       </div>
     </div>
   </div>
@@ -113,7 +113,7 @@ const [isSearching, setIsSearching] = useState(false);
     setSearchResults(null);
   };
   return (
-    <div className="min-h-screen bg-gray-900 dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-purple-50 to-white dark:bg-gray-900 transition-colors duration-300">
       
       {/* SECTION 1: HERO */}
       <div className="relative min-h-[90vh] flex flex-col justify-center overflow-hidden pb-10">
@@ -142,7 +142,7 @@ const [isSearching, setIsSearching] = useState(false);
               </span>
             </h1>
 
-            <p className="max-w-2xl text-lg text-gray-200 font-medium mb-8 drop-shadow-md mx-auto lg:mx-0">
+            <p className="max-w-2xl text-lg text-gray-600 dark:text-gray-200 font-medium mb-8 drop-shadow-md mx-auto lg:mx-0">
               Join 1000+ students booking the best private libraries in Hazaribagh.
             </p>
             <div className="w-full max-w-xl mx-auto lg:mx-0">
@@ -168,7 +168,7 @@ const [isSearching, setIsSearching] = useState(false);
      {/* ================= SECTION 2: SEARCH RESULTS ================= */}
       {/* Logic: Show if we have results OR if we are currently searching */}
       {(searchResults || isSearching) && (
-        <div ref={resultsRef} className="relative z-20 py-12 bg-gray-900/95 border-y border-white/10 backdrop-blur-lg">
+        <div ref={resultsRef} className="relative z-20 py-12 bg-gradient-to-b from-blue-100 to-purple-50 dark:bg-gray-900/95 border-y border-blue-200 dark:border-white/10 backdrop-blur-lg">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
                 {/* Header */}

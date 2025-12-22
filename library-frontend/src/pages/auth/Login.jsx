@@ -77,7 +77,7 @@ const [showPassword, setShowPassword] = useState(false);
     <div 
       id="login-overlay"
       onClick={handleOverlayClick}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-900 cursor-pointer"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-100 via-purple-50 to-white dark:bg-gray-900 cursor-pointer transition-colors duration-300"
     >
       
       {/* BACKGROUND */}
@@ -118,7 +118,7 @@ const [showPassword, setShowPassword] = useState(false);
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-600 text-white placeholder-gray-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-800/50 border border-blue-300 dark:border-gray-600 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all shadow-sm"
                 placeholder="student@example.com"
               />
             </div>
@@ -130,7 +130,7 @@ const [showPassword, setShowPassword] = useState(false);
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-600 text-white placeholder-gray-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all pr-10" // added pr-10 for icon space
+                  className="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-800/50 border border-blue-300 dark:border-gray-600 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all pr-10 shadow-sm"
                   placeholder="••••••••"
                 />
                 

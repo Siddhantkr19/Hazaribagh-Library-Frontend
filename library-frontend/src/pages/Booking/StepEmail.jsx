@@ -67,7 +67,7 @@ const StepEmail = () => {
                         placeholder="student@example.com"
                         value={emailInput}
                         onChange={(e) => setEmailInput(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-gray-800 border border-gray-700 rounded-xl text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                        className="w-full pl-12 pr-4 py-4 bg-white dark:bg-gray-800 border border-blue-300 dark:border-gray-700 rounded-xl text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"
                     />
                 </div>
             </div>

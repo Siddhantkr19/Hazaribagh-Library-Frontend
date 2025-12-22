@@ -53,7 +53,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-100 to-orange-50 dark:bg-gray-900 px-4 transition-colors duration-300">
        <div className="absolute inset-0 z-0 pointer-events-none">
          <img src="/Background Image.jpg" alt="bg" className="w-full h-full object-cover opacity-30" />
          <div className="absolute inset-0 bg-black/70"></div>

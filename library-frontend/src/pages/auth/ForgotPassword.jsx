@@ -26,7 +26,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-100 to-blue-50 dark:bg-gray-900 px-4 transition-colors duration-300">
       {/* Background Image (Optional) */}
       <div className="absolute inset-0 z-0 pointer-events-none">
          <img src="/Background Image.jpg" alt="bg" className="w-full h-full object-cover opacity-30" />
@@ -59,7 +59,7 @@ const ForgotPassword = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-gray-800/50 border border-gray-600 text-white focus:ring-2 focus:ring-orange-500 outline-none"
+              className="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-800/50 border border-cyan-300 dark:border-gray-600 text-gray-800 dark:text-white focus:ring-2 focus:ring-orange-500 outline-none shadow-sm"
               placeholder="student@example.com"
             />
           </div>

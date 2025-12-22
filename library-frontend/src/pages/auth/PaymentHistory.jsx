@@ -22,7 +22,7 @@ const PaymentHistory = () => {
       try {
         // Re-using the dashboard endpoint for now since it returns bookings.
         // Ideally, you'd have a specific /history endpoint if the data differs.
-        const response = await bookingApi.get(`/dashboard?userEmail=${user.email}`);
+        const response = await bookingApi.get(`/bookings/dashboard?userEmail=${user.email}`);
         setHistory(response.data);
       } catch (err) {
         console.error("Failed to fetch history:", err);

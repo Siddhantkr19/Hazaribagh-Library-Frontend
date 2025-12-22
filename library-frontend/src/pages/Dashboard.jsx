@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import bookingApi from '../services/bookingApi';
 import profilePictureService from '../services/profilePicture';
 // import profilePictureService from '../services/profilePicture';
-import api from '../services/api';
 
 const Dashboard = () => {
 const { user, login, logout } = useAuth(); // Destructure login
@@ -27,7 +26,7 @@ const [uploading, setUploading] = useState(false);
       if (!user?.email) return;
 
       try {
-        const response = await bookingApi.get(`/dashboard?userEmail=${user.email}`);
+        const response = await bookingApi.get(`/bookings/dashboard?userEmail=${user.email}`);
         setActiveBookings(response.data);
       } catch (err) {
         console.error("Failed to fetch dashboard data:", err);
@@ -39,19 +38,17 @@ const [uploading, setUploading] = useState(false);
     fetchDashboardData();
   }, [user]);
 
-  // --- [NEW] LOGOUT HANDLER ---
-  const handleLogout = async () => {
+ // Inside Dashboard component
+const handleLogout = async () => {
     try {
-        // 1. Call Backend to clear Cookie
-        await api.post('/auth/logout'); 
+        // 1. Call server to clear cookie
+        await bookingApi.post('/auth/logout'); // Ensure you use the correct API instance
     } catch (error) {
         console.error("Logout failed on server", error);
-    } finally {
-        // 2. Clear Frontend State
-        logout(); 
-        navigate('/');
-    }
-  };
+    } 
+    // 2. Perform client-side cleanup regardless of server error
+    logout(); 
+};
 
   if (!user) return null;
 
@@ -100,7 +97,7 @@ const getProfileImage = () => {
   };
   if (!user) return null;
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 pt-24 pb-12 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 pt-24 pb-12 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-300">
       
       {/* Background Decor */}
       <div className="fixed inset-0 z-0 pointer-events-none">

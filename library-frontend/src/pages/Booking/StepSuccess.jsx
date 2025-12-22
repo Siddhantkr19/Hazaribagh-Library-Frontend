@@ -17,7 +17,7 @@ const StepSuccess = () => {
             Your seat at <strong className="text-white">{library.name}</strong> has been confirmed.
         </p>
 
-        <div className="bg-gray-800 rounded-xl p-4 border border-dashed border-gray-600 mb-8">
+        <div className="bg-gradient-to-r from-green-100 to-emerald-100 dark:bg-gray-800 rounded-xl p-4 border border-green-300 dark:border-dashed dark:border-gray-600 mb-8 shadow-sm">
             <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Status</p>
             <p className="text-green-400 font-bold">Active & Paid</p>
         </div>

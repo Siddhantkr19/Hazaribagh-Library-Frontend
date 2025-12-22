@@ -34,12 +34,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
-  const logout = () => {
+const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
-    window.location.href = '/'; 
-    
-  };
+    // Do NOT use window.location.href. 
+    // Since AuthContext wraps the app, setting user to null 
+    // will trigger the useEffect in Login.js or ProtectedRoutes to handle redirection.
+};
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>

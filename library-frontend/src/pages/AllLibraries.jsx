@@ -11,13 +11,11 @@ const AllLibraries = () => {
   const [activeFilter, setActiveFilter] = useState('All'); 
 
   useEffect(() => {
-    // ... (Your existing fetch logic remains the same) ...
     const fetchLibraries = async () => {
       try {
         const response = await axios.get('http://localhost:8080/api/libraries');
-        // ... mapping logic ...
-        // (Assuming mapping logic is same as before)
-         const formattedData = response.data.map(lib => ({
+        
+        const formattedData = response.data.map(lib => ({
             id: lib.id,
             name: lib.name,
             location: lib.locationTag || lib.address || "Hazaribagh", 
@@ -40,10 +38,8 @@ const AllLibraries = () => {
     fetchLibraries();
   }, []);
 
-  // ... (Your existing filter useEffect remains the same) ...
   useEffect(() => {
     let result = libraries;
-    // ... filter logic ...
     if (activeFilter === 'Matwari') result = result.filter(lib => lib.location.toLowerCase().includes('matwari'));
     else if (activeFilter === 'Korrah') result = result.filter(lib => lib.location.toLowerCase().includes('korrah'));
     else if (activeFilter === 'Under 400') result = result.filter(lib => lib.price <= 400);
@@ -59,7 +55,7 @@ const AllLibraries = () => {
   const FilterButton = ({ label, value }) => (
     <button 
       onClick={() => setActiveFilter(value)}
-      // ✅ FIX: Added dark mode classes
+      // ✅ FIX: Improved button visibility in both modes
       className={`px-5 py-2 rounded-full font-medium text-sm transition-all shadow-sm border ${
         activeFilter === value 
           ? 'bg-blue-600 text-white border-blue-600 shadow-blue-500/30' 
@@ -72,7 +68,7 @@ const AllLibraries = () => {
 
   return (
     // ✅ FIX: Main Background (Light vs Dark)
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-purple-50 to-white dark:bg-gray-900 transition-colors duration-300 font-sans">
+ <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 font-sans">
       
       <div className="absolute inset-0 z-0"></div>
 
@@ -108,7 +104,7 @@ const AllLibraries = () => {
                         placeholder="Search by library name, location..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full py-3.5 px-4 bg-transparent text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 outline-none text-base"
+                        className="w-full py-3.5 px-4 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 outline-none text-base"
                     />
                     {searchQuery && (
                         <button onClick={() => setSearchQuery('')} className="pr-4 text-gray-500 hover:text-gray-700 dark:hover:text-white">✕</button>

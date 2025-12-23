@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Outlet, useNavigate } from 'react-router-dom';
 import { getLibraryById } from '../../services/bookingApi';
-import { MapPin, Wifi, Zap, Coffee, Loader2 } from 'lucide-react';
+import { MapPin, Loader2, Star, ShieldCheck } from 'lucide-react';
 
 const BookingLayout = () => {
   const { id } = useParams();
@@ -13,18 +13,18 @@ const BookingLayout = () => {
       try {
         const data = await getLibraryById(id);
         const formatted = {
-            id: data.id,
-            name: data.name,
-            location: data.locationTag || "Hazaribagh",
-            image: data.images?.[0] || "https://images.unsplash.com/photo-1497366216548-37526070297c",
-            rating: 4.8,
-            amenities: data.amenities || ["WiFi", "AC"],
-            offerPrice: data.offerPrice
+           id: data.id,
+           name: data.name,
+           location: data.locationTag || "Hazaribagh",
+           image: data.images?.[0] || "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2070&auto=format&fit=crop",
+           rating: 4.8,
+           amenities: data.amenities || ["WiFi", "AC", "Water"],
+           offerPrice: data.offerPrice
         };
         setLibrary(formatted);
       } catch (err) {
         console.error(err);
-        navigate('/libraries'); // Redirect if failed
+        navigate('/libraries'); 
       }
     };
     fetchLib();
@@ -32,50 +32,75 @@ const BookingLayout = () => {
 
   if (!library) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-violet-100 to-blue-50 dark:bg-gray-900 flex items-center justify-center transition-colors duration-300">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#020617] flex items-center justify-center">
         <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-100 to-blue-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative overflow-hidden transition-colors duration-300">
+    // ✅ FIX: Dynamic Background (Light Gray vs Deep Dark Blue)
+    <div className="min-h-screen bg-gray-50 dark:bg-[#020617] text-gray-900 dark:text-white py-4 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative overflow-hidden font-sans transition-colors duration-300">
       
-      {/* Background Blobs */}
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/20 rounded-full blur-[100px]"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-600/20 rounded-full blur-[100px]"></div>
+      {/* Background Glows (Only visible in Dark Mode) */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none opacity-0 dark:opacity-100"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none opacity-0 dark:opacity-100"></div>
 
-      <div className="relative z-10 max-w-5xl w-full bg-gradient-to-br from-white to-blue-50 dark:bg-gray-800/50 backdrop-blur-xl border border-blue-200 dark:border-white/10 rounded-[2rem] shadow-2xl shadow-blue-300/30 dark:shadow-none overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+      {/* Main Card */}
+      {/* ✅ FIX: Card Background (White vs Dark Glass) */}
+      <div className="relative z-10 w-full max-w-5xl bg-white dark:bg-[#0f172a]/60 backdrop-blur-2xl border border-gray-200 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[650px] transition-colors duration-300">
         
-        {/* === LEFT SIDE: STATIC VISUALS === */}
-        <div className="w-full md:w-1/2 relative h-64 md:h-auto">
-            <img src={library.image} alt={library.name} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
-            
-            <div className="absolute bottom-0 left-0 p-8 w-full">
-                <div className="inline-block px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/30 rounded-full text-xs font-bold mb-4">
-                    ⚡ Fast Filling
-                </div>
-                <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2 leading-tight">{library.name}</h1>
-                <p className="text-gray-300 flex items-center gap-2 mb-6">
-                    <MapPin className="w-4 h-4 text-blue-400" /> {library.location}
-                </p>
+        {/* === LEFT SIDE: VISUALS === */}
+        <div className="w-full md:w-[45%] relative h-64 md:h-auto group">
+           {/* Image */}
+           <img src={library.image} alt={library.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+           
+           {/* ✅ FIX: Gradient Overlay matches card background */}
+           <div className="absolute inset-0 bg-gradient-to-t from-white via-white/60 to-transparent dark:from-[#0f172a] dark:via-[#0f172a]/60 dark:to-transparent"></div>
+           
+           {/* Content Overlay */}
+           <div className="absolute bottom-0 left-0 p-8 w-full z-20">
+               <div className="flex items-center gap-2 mb-3">
+                   <div className="px-3 py-1 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                       ⚡ Fast Filling
+                   </div>
+                   <div className="px-3 py-1 bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-500/30 rounded-full text-[10px] font-bold flex items-center gap-1">
+                       <Star size={10} fill="currentColor" /> {library.rating}
+                   </div>
+               </div>
 
-                {/* Amenities */}
-                <div className="flex flex-wrap gap-2">
-                    {library.amenities.slice(0,4).map((am, i) => (
-                        <span key={i} className="px-2.5 py-1 bg-white/10 border border-white/10 rounded-md text-xs text-gray-300 backdrop-blur-md">
-                            {am}
-                        </span>
-                    ))}
-                </div>
-            </div>
+               {/* ✅ FIX: Text Colors */}
+               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 leading-tight drop-shadow-sm">{library.name}</h1>
+               
+               <p className="text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-6 text-sm font-medium">
+                   <MapPin className="w-4 h-4 text-blue-500 dark:text-blue-400" /> {library.location}
+               </p>
+
+               {/* Amenities Chips */}
+               <div className="flex flex-wrap gap-2">
+                   {library.amenities.slice(0,4).map((am, i) => (
+                       <span key={i} className="px-3 py-1.5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg text-xs font-medium text-gray-700 dark:text-gray-300 backdrop-blur-md">
+                           {am}
+                       </span>
+                   ))}
+               </div>
+           </div>
         </div>
 
-        {/* === RIGHT SIDE: DYNAMIC STEPS (OUTLET) === */}
-        <div className="w-full md:w-1/2 p-8 md:p-10 flex flex-col justify-center bg-gradient-to-b from-blue-100 to-blue-50 dark:bg-gray-900/40">
-            {/* The Outlet renders StepEmail, StepPayment, or StepSuccess based on route */}
-            <Outlet context={{ library }} />
+        {/* === RIGHT SIDE: FORM AREA === */}
+        <div className="w-full md:w-[55%] p-6 md:p-12 flex flex-col justify-center bg-transparent relative">
+            {/* Subtle Grid Pattern */}
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 dark:opacity-20 pointer-events-none"></div>
+            
+            <div className="relative z-10 max-w-md mx-auto w-full">
+                <Outlet context={{ library }} />
+            </div>
+            
+            <div className="absolute bottom-6 left-0 w-full text-center">
+                <p className="text-[10px] text-gray-900 dark:text-gray-600 flex items-center justify-center gap-1">
+                    <ShieldCheck size={10}/> Powered by LibHub Secure
+                </p>
+            </div>
         </div>
 
       </div>

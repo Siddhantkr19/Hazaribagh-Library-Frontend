@@ -6,7 +6,8 @@ import api from '../../services/api';
 
 const Signup = () => {
   const navigate = useNavigate();
- const { user } = useAuth();
+  const { user } = useAuth();
+  
   // --- [FIX] AUTO-REDIRECT ---
   useEffect(() => {
     if (user) {
@@ -26,7 +27,8 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false); 
-const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (error) setError(null);
@@ -57,12 +59,6 @@ const [showPassword, setShowPassword] = useState(false);
     }
 
     // --- 3. Validate Password ---
-    // At least 1 digit, 1 alphabet, 1 special char, and length > 3 (assuming >3 based on "greater than the digit" logic, usually >6 or >8 is standard)
-    // Regex explanation:
-    // (?=.*[A-Za-z]) -> At least one alphabet
-    // (?=.*\d)       -> At least one digit
-    // (?=.*[@$!%*#?&]) -> At least one special symbol
-    // .{4,}          -> Length greater than 3 (so 4 or more)
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{7,}$/;
     if (!passwordRegex.test(formData.password)) {
       setError("Password must be 8+ chars with 1 letter, 1 number, and 1 symbol.");
@@ -100,34 +96,36 @@ const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div 
-      id="auth-overlay" // ID for detecting clicks
+      id="auth-overlay" 
       onClick={handleOverlayClick}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-100 via-purple-50 to-white dark:bg-gray-900 py-10 cursor-pointer transition-colors duration-300"
+      // ✅ FIX: Dynamic Background (Light vs Dark)
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-900 py-10 cursor-pointer transition-colors duration-300"
     >
       
-      {/* BACKGROUND */}
+      {/* BACKGROUND IMAGE - Only visible in Dark Mode or reduced opacity in Light Mode */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <img src="/Background Image.jpg" alt="Library Background" className="w-full h-full object-cover opacity-50" />
-        <div className="absolute inset-0 bg-black/60"></div>
+        <img src="/Background Image.jpg" alt="Library Background" className="w-full h-full object-cover opacity-10 dark:opacity-40 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-white/30 dark:bg-black/60 backdrop-blur-[2px]"></div>
       </div>
    
-      {/* CARD - Stop propagation to prevent closing when clicking inside */}
+      {/* CARD */}
       <div 
         className="relative z-10 w-full max-w-lg px-4 cursor-default"
         onClick={(e) => e.stopPropagation()} 
       >
-        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl p-8 animate-in fade-in slide-in-from-bottom-8 duration-500">
+        {/* ✅ FIX: Card Background (Light vs Dark Glass) */}
+        <div className="bg-white/80 dark:bg-white/10 backdrop-blur-xl border border-white/50 dark:border-white/10 rounded-3xl shadow-2xl p-8 animate-in fade-in slide-in-from-bottom-8 duration-500">
           
           {success ? (
             // Success Message View
             <div className="text-center py-10">
-              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
-                <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 mb-6">
+                <svg className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h2 className="text-3xl font-extrabold text-white mb-4">Account Created!</h2>
-              <p className="text-gray-300 mb-8">Your account has been successfully created. You can now log in to start booking.</p>
+              <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-4">Account Created!</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-8">Your account has been successfully created. You can now log in to start booking.</p>
               <Link 
                 to="/login" 
                 className="inline-block w-full py-3.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-lg shadow-lg transition-all transform hover:-translate-y-0.5"
@@ -139,12 +137,12 @@ const [showPassword, setShowPassword] = useState(false);
             // Signup Form View
             <>
               <div className="text-center mb-6">
-                <h1 className="text-3xl font-extrabold text-orange-400 mb-2">Create Account</h1>
-                <p className="text-gray-300 text-sm">Join LibHub and start booking your seat.</p>
+                <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">Create Account</h1>
+                <p className="text-gray-500 dark:text-gray-300 text-sm">Join LibHub and start booking your seat.</p>
               </div>
 
               {error && (
-                <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-xs text-center">
+                <div className="mb-4 p-3 bg-red-100 dark:bg-red-500/20 border border-red-200 dark:border-red-500/50 rounded-lg text-red-600 dark:text-red-200 text-xs text-center font-medium">
                   {error}
                 </div>
               )}
@@ -153,14 +151,15 @@ const [showPassword, setShowPassword] = useState(false);
                 
                 {/* Full Name */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-300 mb-1">Full Name</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
                   <input 
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
                     type="text" 
                     required
-                    className="w-full px-4 py-3 rounded-lg bg-gray-200 dark:bg-gray-800/50 border border-gray-400 dark:border-gray-600 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
+                    // ✅ FIX: Input Colors
+                    className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm transition-all" 
                     placeholder="Rahul Kumar" 
                   />
                 </div>
@@ -168,37 +167,47 @@ const [showPassword, setShowPassword] = useState(false);
                 {/* Email & Phone Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1">Email</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                     <input 
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
                       type="email" 
                       required
-                      className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-800/50 border border-purple-300 dark:border-gray-600 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none shadow-sm" 
+                      className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm transition-all" 
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-300 mb-1">Phone Number</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
                     <input 
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
                       type="tel" 
-                      // required
-                      className="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-600 text-white focus:ring-2 focus:ring-blue-500 outline-none" 
+                      className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 outline-none shadow-sm transition-all" 
                       placeholder="9988776655" 
                     />
                   </div>
                 </div>
 
-                {/* Password */}
-              {/* Password Field (Eye Logic) */}
+                {/* Password Field */}
                 <div className="relative">
-                  <label className="block text-xs font-medium text-gray-300 mb-1">Password</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
                   <div className="relative">
-                    <input name="password" value={formData.password} onChange={handleChange} type={showPassword ? "text" : "password"} required className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-800/50 border border-purple-300 dark:border-gray-600 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none pr-10 shadow-sm" placeholder="Create strong password" />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none">
+                    <input 
+                      name="password" 
+                      value={formData.password} 
+                      onChange={handleChange} 
+                      type={showPassword ? "text" : "password"} 
+                      required 
+                      className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 outline-none pr-10 shadow-sm transition-all" 
+                      placeholder="Create strong password" 
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPassword(!showPassword)} 
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-white focus:outline-none transition-colors"
+                    >
                       {showPassword ? (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
                       ) : (
@@ -208,12 +217,24 @@ const [showPassword, setShowPassword] = useState(false);
                   </div>
                 </div>
 
-                {/* Confirm Password Field (Eye Logic) */}
+                {/* Confirm Password Field */}
                 <div className="relative">
-                  <label className="block text-xs font-medium text-gray-300 mb-1">Confirm Password</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
                   <div className="relative">
-                    <input name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} type={showPassword? "text" : "password"} required className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-800/50 border border-purple-300 dark:border-gray-600 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none pr-10 shadow-sm" placeholder="Repeat password" />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none">
+                    <input 
+                      name="confirmPassword" 
+                      value={formData.confirmPassword} 
+                      onChange={handleChange} 
+                      type={showPassword ? "text" : "password"} 
+                      required 
+                      className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 outline-none pr-10 shadow-sm transition-all" 
+                      placeholder="Repeat password" 
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPassword(!showPassword)} 
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-white focus:outline-none transition-colors"
+                    >
                       {showPassword ? (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
                       ) : (
@@ -233,22 +254,22 @@ const [showPassword, setShowPassword] = useState(false);
 
               {/* Social Login Section */}
               <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-600"></div></div>
-                <div className="relative flex justify-center text-xs uppercase"><span className="px-2 bg-transparent text-gray-400">Or</span></div>
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-300 dark:border-gray-600"></div></div>
+                <div className="relative flex justify-center text-xs uppercase"><span className="px-2 bg-transparent text-gray-500 dark:text-gray-400">Or</span></div>
               </div>
 
-            {/* // ✅ NEW CODE (Link to Backend) */}
-<a 
-  href="http://localhost:8080/oauth2/authorization/google"
-  className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-600 rounded-xl hover:bg-white/5 transition-all text-white font-medium text-sm"
->
-  <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-  Sign up with Google
-</a>
+              {/* ✅ NEW CODE (Link to Backend) */}
+              <a 
+                href="http://localhost:8080/oauth2/authorization/google"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-transparent hover:bg-gray-50 dark:hover:bg-white/5 transition-all text-gray-700 dark:text-white font-medium text-sm shadow-sm"
+              >
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+                Sign up with Google
+              </a>
 
-              <p className="mt-6 text-center text-sm text-gray-400">
+              <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
                 Already have an account?{' '}
-                <Link to="/login" className="font-bold text-blue-400 hover:text-blue-300 transition-colors">
+                <Link to="/login" className="font-bold text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors">
                   Login here
                 </Link>
               </p>

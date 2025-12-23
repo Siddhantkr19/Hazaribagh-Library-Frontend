@@ -9,17 +9,29 @@ const AdminLayout = () => {
   const location = useLocation();
 
   const menuItems = [
-    { name: 'Overview', icon: <LayoutDashboard size={20} />, path: '/admin' },
+    { name: 'Dashboard ', icon: <LayoutDashboard size={20} />, path: '/admin' },
     { name: 'Bookings', icon: <BookOpen size={20} />, path: '/admin/bookings' },
     { name: 'Students', icon: <Users size={20} />, path: '/admin/students' },
     { name: 'Finance', icon: <Wallet size={20} />, path: '/admin/finance' },
     { name: 'Manage Libraries', icon: <MapPin size={20} />, path: '/admin/libraries' },
   ];
 
+  // ✅ ADDED: Wrapper function to handle Logout + Redirect
+  const handleLogout = () => {
+    // 1. Call the context logout function
+    logout(); 
+    
+    // 2. Force redirect to Login page
+    navigate('/login');
+    
+    // 3. (Optional) Force reload to clear all memory states
+    // window.location.reload(); 
+  };
+
   return (
     <div className="flex h-screen bg-gray-900 font-sans text-gray-100 overflow-hidden">
       
-      {/* --- SIDEBAR (Dark & Glassy) --- */}
+      {/* --- SIDEBAR --- */}
       <aside className="w-64 bg-black/40 backdrop-blur-xl border-r border-white/10 flex flex-col fixed h-full z-20 transition-all duration-300">
         
         {/* Header */}
@@ -49,9 +61,7 @@ const AdminLayout = () => {
                     : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
                 }`}
               >
-                {/* Active Indicator Line */}
                 {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-r-full" />}
-                
                 <span className={`transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
                     {item.icon}
                 </span>
@@ -64,8 +74,9 @@ const AdminLayout = () => {
         {/* Footer / Logout */}
         <div className="p-4 border-t border-white/10 bg-black/20">
           <button
-            onClick={logout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-red-400 hover:bg-red-500/10 hover:border-red-500/30 border border-transparent rounded-xl transition-all duration-300"
+            // ✅ UPDATED: Use the new handler instead of just 'logout'
+            onClick={handleLogout} 
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-red-400 hover:bg-red-500/10 hover:border-red-500/30 border border-transparent rounded-xl transition-all duration-300 cursor-pointer"
           >
             <LogOut size={18} />
             <span className="font-medium text-sm">Sign Out</span>
@@ -75,18 +86,16 @@ const AdminLayout = () => {
 
       {/* --- MAIN CONTENT AREA --- */}
       <main className="flex-1 ml-64 relative bg-gray-900 overflow-y-auto">
-        {/* Background Glow Effect */}
         <div className="absolute top-0 left-0 w-full h-96 bg-blue-900/10 blur-[120px] pointer-events-none" />
         
         <div className="p-8 relative z-10">
             {/* Top Bar */}
             <div className="flex justify-between items-center mb-10">
             <div>
-                <h1 className="text-3xl font-bold text-white mb-1">Dashboard Overview</h1>
+                <h1 className="text-3xl font-bold text-white mb-1">Dashboard</h1>
                 <p className="text-gray-400 text-sm">Welcome back, <span className="text-blue-400 font-semibold">{user?.name || 'Admin'}</span></p>
             </div>
             
-            {/* Profile Pill */}
             <div className="flex items-center gap-4 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
                 <div className="text-right hidden sm:block">
                     <p className="text-xs text-gray-400">System Status</p>
@@ -100,7 +109,6 @@ const AdminLayout = () => {
             </div>
             </div>
             
-            {/* Dynamic Page Content */}
             <Outlet /> 
         </div>
       </main>

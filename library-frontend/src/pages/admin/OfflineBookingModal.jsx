@@ -1,27 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { X, Check, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import api from '../../services/adminApi'; // <--- USE THIS
+import api from '../../services/adminApi'; 
 
 const OfflineBookingModal = ({ isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [libraries, setLibraries] = useState([]);
   
-  // Form State
   const [formData, setFormData] = useState({
     studentEmail: '',
     libraryId: '',
     seatNumber: '',
     amountPaid: '',
-    durationDays: 30 // Default to 1 month
+    durationDays: 30 
   });
 
-  // Fetch Libraries so Admin can select one from a list
   useEffect(() => {
     if (isOpen) {
       const fetchLibs = async () => {
         try {
-          // Assuming you have a public endpoint for libraries
           const { data } = await api.get('/libraries');
           setLibraries(data);
         } catch (error) {
@@ -41,24 +38,23 @@ const OfflineBookingModal = ({ isOpen, onClose }) => {
     setLoading(true);
 
     try {
-      // Call the NEW Backend Endpoint
+      // ✅ FIX: URL must be EXACTLY '/admin/book-offline'
       await api.post('/admin/book-offline', {
-        ...formData,
-        libraryId: Number(formData.libraryId), // Ensure ID is a number
+        studentEmail: formData.studentEmail,
+        libraryId: Number(formData.libraryId),
+        seatNumber: formData.seatNumber,
         amountPaid: Number(formData.amountPaid),
         durationDays: Number(formData.durationDays)
       });
 
       toast.success("Booking Created Successfully!");
-      onClose(); // Close the modal
-      
-      // Reset Form
+      onClose();
       setFormData({ studentEmail: '', libraryId: '', seatNumber: '', amountPaid: '', durationDays: 30 });
       
     } catch (error) {
-      console.error(error);
-      // Show the exact error message from Backend (e.g., "Student email not found")
-      toast.error(error.response?.data || "Failed to create booking.");
+      console.error("Booking Error:", error);
+      const errMsg = error.response?.data?.message || error.response?.data || "Failed to create booking.";
+      toast.error(typeof errMsg === 'string' ? errMsg : "Failed to create booking");
     } finally {
       setLoading(false);
     }
@@ -69,8 +65,6 @@ const OfflineBookingModal = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-gray-900 border border-white/10 w-full max-w-md p-6 rounded-2xl shadow-2xl relative">
-        
-        {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-white">Add Offline Booking</h2>
           <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full text-gray-400 transition-colors">
@@ -78,33 +72,15 @@ const OfflineBookingModal = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          
-          {/* 1. Student Email */}
           <div>
             <label className="block text-xs font-medium text-gray-400 mb-1">Student Email</label>
-            <input 
-              required
-              type="email" 
-              name="studentEmail"
-              placeholder="student@example.com"
-              value={formData.studentEmail}
-              onChange={handleChange}
-              className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none transition-colors"
-            />
+            <input required type="email" name="studentEmail" placeholder="student@example.com" value={formData.studentEmail} onChange={handleChange} className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none transition-colors" />
           </div>
 
-          {/* 2. Library Selection */}
           <div>
             <label className="block text-xs font-medium text-gray-400 mb-1">Select Library</label>
-            <select
-              required
-              name="libraryId"
-              value={formData.libraryId}
-              onChange={handleChange}
-              className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none appearance-none"
-            >
+            <select required name="libraryId" value={formData.libraryId} onChange={handleChange} className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none appearance-none">
               <option value="">-- Choose a Branch --</option>
               {libraries.map(lib => (
                 <option key={lib.id} value={lib.id} className="bg-gray-900">
@@ -114,56 +90,26 @@ const OfflineBookingModal = ({ isOpen, onClose }) => {
             </select>
           </div>
 
-          {/* 3. Seat & Amount Row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1">Seat Number</label>
-              <input 
-                type="text" 
-                name="seatNumber"
-                placeholder="e.g. A-12"
-                value={formData.seatNumber}
-                onChange={handleChange}
-                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none"
-              />
+              <input type="text" name="seatNumber" placeholder="e.g. A-12" value={formData.seatNumber} onChange={handleChange} className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none"/>
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1">Amount Paid (₹)</label>
-              <input 
-                required
-                type="number" 
-                name="amountPaid"
-                placeholder="₹"
-                value={formData.amountPaid}
-                onChange={handleChange}
-                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none"
-              />
+              <input required type="number" name="amountPaid" placeholder="₹" value={formData.amountPaid} onChange={handleChange} className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none"/>
             </div>
           </div>
 
-          {/* 4. Duration */}
           <div>
               <label className="block text-xs font-medium text-gray-400 mb-1">Duration (Days)</label>
-              <input 
-                required
-                type="number" 
-                name="durationDays"
-                value={formData.durationDays}
-                onChange={handleChange}
-                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none"
-              />
+              <input required type="number" name="durationDays" value={formData.durationDays} onChange={handleChange} className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none"/>
           </div>
 
-          {/* Submit Button */}
-          <button 
-            type="submit" 
-            disabled={loading}
-            className="w-full mt-6 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
-          >
+          <button type="submit" disabled={loading} className="w-full mt-6 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all">
             {loading ? <Loader2 className="animate-spin" size={20} /> : <Check size={20} />}
             {loading ? "Processing..." : "Confirm Booking"}
           </button>
-
         </form>
       </div>
     </div>

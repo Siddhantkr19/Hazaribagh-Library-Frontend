@@ -44,7 +44,9 @@ const Navbar = () => {
                 LibHub
               </span>
               {/* ✅ Text Color: Dark Gray (Light) / White (Dark) */}
-              <span className="text-[10px] text-gray-600 dark:text-white uppercase tracking-widest leading-none mt-1">Hazaribagh</span>
+       <span className="text-[10px] font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent dark:text-white uppercase tracking-widest leading-none mt-1">
+  Hazaribagh
+</span>
             </div>
           </Link>
 
@@ -62,7 +64,7 @@ const Navbar = () => {
                   {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                 </div>
                 {/* ✅ Text Color */}
-                <span className="text-sm font-medium text-gray-700 dark:text-white">Dashboard</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-white">Profile</span>
               </div>
             ) : (
               // SHOW LOGIN/SIGNUP BUTTONS IF NOT LOGGED IN

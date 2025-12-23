@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Toaster, toast } from 'react-hot-toast'; // Notification Library
-import RevenueChart from '../../components/admin/RevenueChart';
-import OfflineBookingModal from '../../components/admin/OfflineBookingModal';
-import WhatsAppBatchModal from '../../components/admin/WhatsAppBatchModal';
+import RevenueChart from './RevenueChart';
+import OfflineBookingModal from './OfflineBookingModal';
+import WhatsAppBatchModal from './WhatsAppBatchModal';
 import api from '../../services/adminApi';
+import DownloadReportModal from './DownloadReportModal';
+import bookingApi from '../../services/bookingApi';
 import { 
   IndianRupee, Users, Armchair, AlertCircle, 
-  TrendingUp, Loader2, ArrowUpRight, Search, 
+  TrendingUp, Loader2, ArrowUpRight,  FileText,Search, 
   Mail, MonitorPlay, MessageCircle ,MapPin
 } from 'lucide-react';
 
@@ -15,8 +17,11 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
  const [showOfflineModal, setShowOfflineModal] = useState(false);
  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
+ const [showReportModal, setShowReportModal] = useState(false); // ✅ MODAL STATE
+  const [libraries, setLibraries] = useState([]); // ✅ STATE FOR LIBRARY LIST
   useEffect(() => {
     fetchStats();
+    fetchLibraries();
   }, []);
 
   // 1. Fetch Data from Backend
@@ -35,6 +40,16 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
+  };
+  
+  const fetchLibraries = async () => {
+      try {
+          // This fetches the list of libraries for the dropdown
+          const { data } = await bookingApi.get('/libraries');
+          setLibraries(data);
+      } catch (error) {
+          console.error("Failed to load libraries", error);
+      }
   };
 
   // 2. Handle "Send Reminders" Action
@@ -76,12 +91,15 @@ const AdminDashboard = () => {
       text: "text-emerald-400",
       trend: "+12.5% vs last month"
     },
-    { 
+ { 
+   // ✅ IMPROVED VISUALS: Added a permanent green gradient background
       label: "WhatsApp Batch Sender", 
       desc: "Send reminders 1-by-1",
-      icon: <MessageCircle size={18} />, 
-      color: "hover:bg-green-500/20 hover:border-green-500/50 text-green-400",
-      onClick: () => setShowWhatsAppModal(true) 
+      icon: <MessageCircle size={24} />, // Slightly larger icon
+      color: "from-green-500/20 to-emerald-500/5 border-green-500/20 cursor-pointer", // Consistent Green Gradient
+      border: "group-hover:border-green-500/50",
+      text: "text-green-400",
+      onClick: () => setShowWhatsAppModal(true)
     },
     {
       title: "Active Students",
@@ -122,6 +140,13 @@ const AdminDashboard = () => {
       onClick: handleSendReminders // Connects the function
     },
     { 
+        label: "Download History", 
+        desc: "Export PDF Reports",
+        icon: <FileText size={18} />,
+        color: "hover:bg-rose-500/20 hover:border-rose-500/50 text-rose-400",
+        onClick: () => setShowReportModal(true) 
+    },
+    { 
       label: "Add Offline Booking", 
       desc: "For cash payments",
       icon: <MonitorPlay size={18} />,
@@ -140,7 +165,10 @@ const AdminDashboard = () => {
         {cards.map((card, index) => (
           <div 
             key={index} 
-            className={`p-6 rounded-2xl border border-white/5 bg-gradient-to-br ${card.color} backdrop-blur-xl relative overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${card.border}`}
+            // ✅ FIX 1: This makes the box clickable!
+            onClick={card.onClick}
+            // ✅ FIX 2: Adds a hand cursor if it's a clickable card
+            className={`p-6 rounded-2xl border border-white/5 bg-gradient-to-br ${card.color} backdrop-blur-xl relative overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${card.border} ${card.onClick ? 'cursor-pointer' : ''}`}
           >
             {/* Hover Glow Effect */}
             <div className={`absolute -right-12 -top-12 w-32 h-32 rounded-full opacity-0 group-hover:opacity-30 transition-opacity duration-500 blur-3xl bg-white`} />
@@ -156,11 +184,24 @@ const AdminDashboard = () => {
               )}
             </div>
             
-            <h3 className="text-gray-400 text-sm font-medium mb-1 tracking-wide">{card.title}</h3>
-            <p className="text-3xl font-bold text-white mb-2 tracking-tight drop-shadow-md">{card.value}</p>
-            <p className={`text-xs ${card.text} font-medium opacity-80 flex items-center gap-1`}>
-                {index < 2 && <ArrowUpRight size={12} />} {card.trend}
-            </p>
+            {/* ✅ FIX 3: Display 'label' if 'title' is missing (for WhatsApp card) */}
+            <h3 className="text-gray-400 text-sm font-medium mb-1 tracking-wide">
+                {card.title || card.label}
+            </h3>
+            
+            {/* ✅ FIX 4: Display 'desc' if 'value' is missing */}
+            {card.value ? (
+                <p className="text-3xl font-bold text-white mb-2 tracking-tight drop-shadow-md">{card.value}</p>
+            ) : (
+                <p className="text-sm text-gray-200 font-semibold mb-2">{card.desc}</p>
+            )}
+
+            {/* Only show trend row if trend exists */}
+            {card.trend && (
+                <p className={`text-xs ${card.text} font-medium opacity-80 flex items-center gap-1`}>
+                    {index < 2 && <ArrowUpRight size={12} />} {card.trend}
+                </p>
+            )}
           </div>
         ))}
       </div>
@@ -243,6 +284,12 @@ const AdminDashboard = () => {
       <WhatsAppBatchModal 
         isOpen={showWhatsAppModal} 
         onClose={() => setShowWhatsAppModal(false)} 
+      />
+      {/* ✅ ADDED REPORT MODAL */}
+      <DownloadReportModal 
+        isOpen={showReportModal} 
+        onClose={() => setShowReportModal(false)}
+        libraries={libraries} 
       />
     </div>
   );

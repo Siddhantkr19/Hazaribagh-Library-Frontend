@@ -10,7 +10,7 @@ import FallingBackground from './components/FallingBackground';
 import Home from "./pages/Home";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/dashboard/Dashboard";
 import PaymentHistory from "./pages/auth/PaymentHistory";
 import AllLibraries from "./pages/AllLibraries";
 import LibraryDetails from './pages/LibraryDetails';
@@ -29,6 +29,8 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import BookingList from './pages/admin/BookingList';
 import StudentList from './pages/admin/StudentList';
 import ManageLibraries from './pages/admin/ManageLibraries';
+import HelpQueries from './pages/admin/HelpQueries';
+import AdminReviews from './pages/admin/AdminReviews';
 
 // --- LAYOUT WRAPPER FOR USER PAGES ---
 const MainLayout = () => (
@@ -90,6 +92,8 @@ function App() {
           <Route path="students" element={<StudentList />} /> 
           <Route path="libraries" element={<ManageLibraries />} />
           <Route path="finance" element={<AdminDashboard />} /> 
+          <Route path="help" element={<HelpQueries />} />
+          <Route path="reviews" element={<AdminReviews />} />
         </Route>
 
       </Routes>

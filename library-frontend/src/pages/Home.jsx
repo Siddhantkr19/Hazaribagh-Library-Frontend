@@ -112,7 +112,7 @@ const Home = () => {
           <img 
             src="Background Image.jpg" 
             alt="Hazaribagh Study Center" 
-            className="w-full h-full object-cover brightness-95"
+            className="w-full h-full object-cover brightness-120"
           />
           {/* Overlay Adjustment */}
           <div className="absolute inset-0 bg-black/50 dark:bg-black/60"></div>

@@ -22,7 +22,9 @@ const AllLibraries = () => {
             seats: lib.totalSeats || 0,
             price: lib.offerPrice,
             oldPrice: lib.originalPrice,
-            rating: 4.5, 
+            // Mapping dynamic rating fields from backend
+            averageRating: lib.averageRating || 0, 
+            totalReviews: lib.totalReviews || 0,
             amenities: lib.amenities || ["WiFi", "AC"], 
             image: (lib.images && lib.images.length > 0) ? lib.images[0] : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop"
         }));
@@ -55,7 +57,6 @@ const AllLibraries = () => {
   const FilterButton = ({ label, value }) => (
     <button 
       onClick={() => setActiveFilter(value)}
-      // ✅ FIX: Improved button visibility in both modes
       className={`px-5 py-2 rounded-full font-medium text-sm transition-all shadow-sm border ${
         activeFilter === value 
           ? 'bg-blue-600 text-white border-blue-600 shadow-blue-500/30' 
@@ -67,16 +68,12 @@ const AllLibraries = () => {
   );
 
   return (
-    // ✅ FIX: Main Background (Light vs Dark)
- <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 font-sans">
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 font-sans">
       
-      <div className="absolute inset-0 z-0"></div>
-
       <div className="relative z-10 pt-28 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="mb-8 text-center animate-in fade-in slide-in-from-bottom-8 duration-700">
-          {/* ✅ FIX: Headings Text Color */}
           <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-4">
             Explore All Libraries
           </h1>
@@ -88,17 +85,14 @@ const AllLibraries = () => {
         {/* --- SEARCH & FILTERS SECTION --- */}
         <div className="max-w-4xl mx-auto mb-12 space-y-6">
             
-            {/* 1. Search Bar */}
             <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl opacity-30 group-hover:opacity-60 blur transition duration-500"></div>
-                {/* ✅ FIX: Search Input Background */}
                 <div className="relative flex items-center bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-blue-300 dark:border-gray-700 shadow-lg shadow-blue-200/50 dark:shadow-none">
                     <span className="pl-4 text-gray-400">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </span>
-                    {/* ✅ FIX: Input Text Color */}
                     <input 
                         type="text"
                         placeholder="Search by library name, location..."
@@ -112,13 +106,12 @@ const AllLibraries = () => {
                 </div>
             </div>
 
-            {/* 2. Filter Buttons */}
             <div className="flex flex-wrap justify-center gap-3">
-               <FilterButton label="All" value="All" />
-               <FilterButton label="📍 Matwari" value="Matwari" />
-               <FilterButton label="📍 Korrah" value="Korrah" />
-               <FilterButton label="💰 Under ₹400" value="Under 400" />
-               <FilterButton label="❄️ AC" value="AC" />
+                <FilterButton label="All" value="All" />
+                <FilterButton label="📍 Matwari" value="Matwari" />
+                <FilterButton label="📍 Korrah" value="Korrah" />
+                <FilterButton label="💰 Under ₹400" value="Under 400" />
+                <FilterButton label="❄️ AC" value="AC" />
             </div>
         </div>
 
@@ -138,18 +131,14 @@ const AllLibraries = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredData.map((lib, index) => (
                             <div key={lib.id} className="relative animate-in fade-in zoom-in duration-500" style={{ animationDelay: `${index * 100}ms` }}>
-                                
-                                {/* ✅ FIX: Number Badge */}
                                 <div className="absolute -top-3 -left-3 w-8 h-8 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-full flex items-center justify-center font-bold text-sm shadow-xl z-10">
                                     {index + 1}
                                 </div>
-                                
                                 <LibraryCard library={lib} />
                             </div>
                         ))}
                     </div>
                 ) : (
-                    // ✅ FIX: Empty State
                     <div className="text-center py-16 bg-white dark:bg-white/5 rounded-3xl border border-dashed border-gray-300 dark:border-white/10">
                         <div className="text-4xl mb-4">🔍</div>
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No libraries found</h3>
@@ -166,7 +155,6 @@ const AllLibraries = () => {
                 )}
             </>
         )}
-
       </div>
     </div>
   );

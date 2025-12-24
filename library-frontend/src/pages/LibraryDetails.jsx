@@ -1,23 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+// ✅ ADDED: Star and MessageSquare for the review UI
+import { Star, MessageSquare, MapPin, Clock, CheckCircle } from 'lucide-react';
 
 const LibraryDetails = () => {
   const { id } = useParams(); 
   const navigate = useNavigate(); 
   
   const [library, setLibrary] = useState(null);
+  const [reviews, setReviews] = useState([]); // ✅ NEW: State for reviews
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchLibraryDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/libraries/${id}`);
-        setLibrary(response.data);
+        // 1. Fetch Library Info
+        const libResponse = await axios.get(`http://localhost:8080/api/libraries/${id}`);
+        setLibrary(libResponse.data);
+
+        // 2. ✅ NEW: Fetch Public Reviews
+        const reviewResponse = await axios.get(`http://localhost:8080/api/reviews/library/${id}`);
+        setReviews(reviewResponse.data);
+
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching library details:", err);
+        console.error("Error fetching details:", err);
         setError("Failed to load library details.");
         setLoading(false);
       }
@@ -35,7 +44,6 @@ const LibraryDetails = () => {
     : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop";
 
   return (
-    // ✅ FIX: Dynamic Background for Light/Dark Mode
     <div className="min-h-screen pt-28 pb-12 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       
       <div className="relative z-10 max-w-6xl mx-auto">
@@ -46,45 +54,110 @@ const LibraryDetails = () => {
         </Link>
 
         {/* --- MAIN CONTENT GRID --- */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           
-          {/* LEFT COLUMN: Images */}
-          <div className="space-y-4">
-            <div className="rounded-3xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700 h-96 relative group">
-               <img 
-                 src={mainImage} 
-                 alt={library.name} 
-                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-               />
-               <div className="absolute top-4 left-4 bg-white/90 dark:bg-black/60 backdrop-blur-md px-4 py-1 rounded-full text-sm font-bold border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white shadow-lg">
-                 📍 {library.locationTag || "Hazaribagh"}
-               </div>
-            </div>
-            
-            {/* Gallery Preview */}
-            {library.images && library.images.length > 1 && (
-                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                    {library.images.slice(1).map((img, idx) => (
-                        <img key={idx} src={img} alt="Gallery" className="w-24 h-24 rounded-xl object-cover border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-80 transition-opacity shadow-sm" />
-                    ))}
+          {/* LEFT COLUMN: Images & Reviews */}
+          <div className="space-y-12">
+            <div className="space-y-4">
+                <div className="rounded-3xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700 h-96 relative group">
+                <img 
+                    src={mainImage} 
+                    alt={library.name} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                />
+                <div className="absolute top-4 left-4 bg-white/90 dark:bg-black/60 backdrop-blur-md px-4 py-1 rounded-full text-sm font-bold border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white shadow-lg">
+                    📍 {library.locationTag || "Hazaribagh"}
                 </div>
-            )}
+                </div>
+                
+                {/* Gallery Preview */}
+                {library.images && library.images.length > 1 && (
+                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                        {library.images.slice(1).map((img, idx) => (
+                            <img key={idx} src={img} alt="Gallery" className="w-24 h-24 rounded-xl object-cover border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-80 transition-opacity shadow-sm" />
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* ✅ NEW: STUDENT REVIEWS SECTION */}
+            <div className="space-y-6">
+                <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                        <MessageSquare className="text-blue-500" />
+                        Student Feedback
+                    </h2>
+                    <span className="text-sm font-semibold text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
+                        {reviews.length} Verified Reviews
+                    </span>
+                </div>
+
+                <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                    {reviews.length > 0 ? (
+                        reviews.map((review) => (
+                            <div key={review.id} className="p-6 bg-white dark:bg-gray-800/40 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm transition-all hover:border-blue-500/30">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold">
+                                            {review.user?.name?.charAt(0) || "S"}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-gray-900 dark:text-white text-sm">{review.user?.name || "Student"}</p>
+                                            <p className="text-xs text-gray-500">{new Date(review.createdAt).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-0.5">
+                                        {[...Array(5)].map((_, i) => (
+                                            <Star 
+                                                key={i} 
+                                                size={14} 
+                                                className={i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200 dark:text-gray-700"} 
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed italic">
+                                    "{review.comment}"
+                                </p>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/20 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+                            <Star size={40} className="mx-auto text-gray-300 mb-4" />
+                            <h3 className="text-gray-500 font-bold">No reviews yet</h3>
+                            <p className="text-gray-400 text-sm">Be the first student to rate this library!</p>
+                        </div>
+                    )}
+                </div>
+            </div>
           </div>
 
           {/* RIGHT COLUMN: Details */}
-          <div className="bg-white dark:bg-gray-800/50 backdrop-blur-xl p-8 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/50 dark:shadow-none">
+          <div className="bg-white dark:bg-gray-800/50 backdrop-blur-xl p-8 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/50 dark:shadow-none sticky top-28">
             
-            {/* ✅ FIX: Title Color */}
-            <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">{library.name}</h1>
-            <p className="text-gray-500 dark:text-gray-400 text-lg mb-6 flex items-center gap-2">
-               🗺️ {library.address || "Address not available"}
-            </p>
+            {/* Title & Static Rating Header */}
+            <div className="flex justify-between items-start mb-6">
+                <div>
+                    <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">{library.name}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                        🗺️ {library.address || "Address not available"}
+                    </p>
+                </div>
+                
+                {/* ✅ NEW: AVG RATING BADGE */}
+                <div className="text-center bg-blue-50 dark:bg-blue-900/20 p-3 rounded-2xl border border-blue-100 dark:border-blue-800/50">
+                    <p className="text-2xl font-black text-blue-600 dark:text-blue-400 flex items-center gap-1 justify-center">
+                        {library.averageRating > 0 ? library.averageRating.toFixed(1) : "N/A"}
+                        <Star size={20} className="fill-blue-600 dark:fill-blue-400" />
+                    </p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mt-1">Rating</p>
+                </div>
+            </div>
 
             {/* Price Card */}
             <div className="bg-blue-50 dark:bg-gray-900/80 rounded-2xl p-6 mb-8 border border-blue-100 dark:border-gray-700 flex justify-between items-center">
                 <div>
                     <p className="text-gray-400 dark:text-gray-500 text-sm line-through">₹{library.originalPrice}</p>
-                    {/* ✅ FIX: Price Color */}
                     <p className="text-3xl font-bold text-blue-600 dark:text-green-400">₹{library.offerPrice}<span className="text-sm text-gray-500 dark:text-gray-400">/mo</span></p>
                 </div>
                 <div className="text-right">
@@ -97,14 +170,13 @@ const LibraryDetails = () => {
 
             {/* Info Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-                {/* ✅ FIX: Info Boxes Colors */}
                 <div className="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-100 dark:border-gray-600/50">
                     <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Opening Hours</p>
                     <p className="text-gray-900 dark:text-white font-semibold">🕒 {library.openingHours || "6 AM - 10 PM"}</p>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-100 dark:border-gray-600/50">
                     <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Owner Contact</p>
-                    <p className="text-gray-900 dark:text-white font-semibold">📞 {library.ownerContact || "Not Available"}</p>
+                    <p className="text-gray-900 dark:text-white font-semibold">📞 {library.contactNumber || "Not Available"}</p>
                 </div>
             </div>
 

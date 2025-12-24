@@ -6,12 +6,12 @@ import { MdOutlineSecurity, MdMeetingRoom } from "react-icons/md";
 import { BiCctv } from "react-icons/bi";
 
 const LibraryCard = ({ library }) => {
-  const { id, name, location, seats, price, oldPrice, image, amenities, rating } = library;
+  // Destructure including new rating fields from backend
+  const { id, name, location, seats, price, oldPrice, image, amenities, averageRating, totalReviews } = library;
   const navigate = useNavigate(); 
 
   const getAmenityConfig = (text) => {
     const lowerText = text.toLowerCase();
-    // ✅ FIX: Adjusted colors for better visibility in Light Mode
     if (lowerText.includes('wifi')) return { icon: <FaWifi />, label: 'WiFi', color: 'text-blue-500 dark:text-blue-400' };
     if (lowerText.includes('non ac')) return { icon: <TbAirConditioningDisabled />, label: 'Non AC', color: 'text-gray-500 dark:text-gray-400' };
     if (lowerText.includes('ac')) return { icon: <TbAirConditioning />, label: 'AC', color: 'text-cyan-600 dark:text-cyan-300' };
@@ -26,14 +26,12 @@ const LibraryCard = ({ library }) => {
   return (
     <div 
       onClick={() => navigate(`/libraries/${id}`)}
-      // ✅ FIX: Outer container logic for Light/Dark
       className="group relative h-full w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden hover:border-blue-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-gray-200 dark:hover:shadow-blue-500/10 hover:-translate-y-2 cursor-pointer"
     >
       <div className="relative w-full h-full bg-white dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl overflow-hidden flex flex-col">
       
         {/* --- Image Section --- */}
         <div className="relative h-48 flex-shrink-0 overflow-hidden">
-          {/* Gradient Overlay only for Dark Mode */}
           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-0 dark:opacity-80 z-10" />
           
           <img 
@@ -47,7 +45,6 @@ const LibraryCard = ({ library }) => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
             </span>
-            {/* ✅ FIX: Text Color */}
             <span className="text-xs font-bold text-gray-800 dark:text-white tracking-wide">{seats} Left</span>
           </div>
 
@@ -63,13 +60,18 @@ const LibraryCard = ({ library }) => {
         <div className="p-5 relative z-20 flex flex-col flex-grow">
           
           <div className="flex justify-between items-start mb-3">
-            {/* ✅ FIX: Title Color */}
             <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
               {name}
             </h3>
             <div className="flex items-center gap-1 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 px-2 py-1 rounded-lg">
               <span className="text-yellow-500 dark:text-yellow-400 text-xs">★</span>
-              <span className="text-xs font-bold text-gray-700 dark:text-gray-200">{rating}</span>
+              {/* Dynamic Rating Logic */}
+              <span className="text-xs font-bold text-gray-700 dark:text-gray-200">
+                {averageRating > 0 ? averageRating.toFixed(1) : "New"}
+              </span>
+              {totalReviews > 0 && (
+                <span className="text-[10px] text-gray-400 ml-0.5">({totalReviews})</span>
+              )}
             </div>
           </div>
 
@@ -78,7 +80,6 @@ const LibraryCard = ({ library }) => {
             {amenities.slice(0, 3).map((item, index) => {
                const config = getAmenityConfig(item);
                return (
-                // ✅ FIX: Badge Background
                 <span key={index} className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
                   <span className={`text-sm ${config.color}`}>{config.icon}</span>
                   <span className="text-gray-600 dark:text-gray-300 text-[10px] font-semibold uppercase tracking-wide">{config.label}</span>
@@ -98,7 +99,6 @@ const LibraryCard = ({ library }) => {
               <div className="flex flex-col">
                 <span className="text-xs text-gray-400 dark:text-gray-500 line-through">₹{oldPrice}</span>
                 <div className="flex items-baseline gap-1">
-                  {/* ✅ FIX: Price Color */}
                   <span className="text-xl font-black text-gray-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-blue-400 dark:to-cyan-300">
                     ₹{price}
                   </span>

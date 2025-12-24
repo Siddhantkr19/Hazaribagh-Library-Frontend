@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { LayoutDashboard, Users, BookOpen, LogOut, Wallet, ShieldCheck, MapPin } from 'lucide-react';
+import { LayoutDashboard, Users, BookOpen, LogOut, Wallet, ShieldCheck, MapPin ,MessageSquare , Star} from 'lucide-react';
 
 const AdminLayout = () => {
   const { logout, user } = useAuth();
@@ -14,6 +14,9 @@ const AdminLayout = () => {
     { name: 'Students', icon: <Users size={20} />, path: '/admin/students' },
     { name: 'Finance', icon: <Wallet size={20} />, path: '/admin/finance' },
     { name: 'Manage Libraries', icon: <MapPin size={20} />, path: '/admin/libraries' },
+    { name: 'Help & Queries', icon: <MessageSquare size={20} />, path: '/admin/help' },
+    { name: 'Reviews', icon: <Star size={20} />, path: '/admin/reviews' },
+    
   ];
 
   // ✅ ADDED: Wrapper function to handle Logout + Redirect

@@ -34,7 +34,7 @@ const ActiveSubscriptions = ({ bookings, loading }) => {
     setChecking(true);
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/reviews/check-eligibility?bookingId=${booking.bookingId}`,
+        `https://libhub-6izs.onrender.com/api/reviews/check-eligibility?bookingId=${booking.bookingId}`,
         { withCredentials: true }
       );
 

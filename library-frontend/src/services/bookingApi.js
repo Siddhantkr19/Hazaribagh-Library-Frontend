@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Base Axios Instance
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api', 
+  baseURL: 'https://libhub-6izs.onrender.com/api', 
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true
 });

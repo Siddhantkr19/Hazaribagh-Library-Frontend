@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; 
-import { FaWifi, FaGlassWater, FaBolt, FaChair } from "react-icons/fa6"; 
+import { FaWifi, FaGlassWater, FaBolt, FaChair, FaStar } from "react-icons/fa6"; // ✅ Added FaStar
 import { TbAirConditioning, TbAirConditioningDisabled } from "react-icons/tb";
 import { MdOutlineSecurity, MdMeetingRoom } from "react-icons/md";
 import { BiCctv } from "react-icons/bi";
@@ -23,6 +23,9 @@ const LibraryCard = ({ library }) => {
     return { icon: <FaChair />, label: text, color: 'text-gray-500 dark:text-gray-300' };
   };
 
+  // ✅ Helper for displaying rating
+  const displayRating = averageRating > 0 ? averageRating.toFixed(1) : "N/A";
+
   return (
     <div 
       onClick={() => navigate(`/libraries/${id}`)}
@@ -40,12 +43,21 @@ const LibraryCard = ({ library }) => {
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
           
-          <div className="absolute top-3 right-3 z-20 bg-white/90 dark:bg-black/60 backdrop-blur-md border border-red-200 dark:border-red-500/30 px-3 py-1 rounded-full flex items-center gap-2 shadow-lg">
+          {/* ✅ MOVED "Seats Left" to TOP-LEFT */}
+          <div className="absolute top-3 left-3 z-20 bg-white/90 dark:bg-black/60 backdrop-blur-md border border-red-200 dark:border-red-500/30 px-3 py-1 rounded-full flex items-center gap-2 shadow-lg">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
             </span>
             <span className="text-xs font-bold text-gray-800 dark:text-white tracking-wide">{seats} Left</span>
+          </div>
+
+          {/* ✅ ADDED Rating Badge to TOP-RIGHT with Icon */}
+          <div className="absolute top-3 right-3 z-20 bg-white/90 dark:bg-black/60 backdrop-blur-md border border-yellow-200 dark:border-yellow-500/30 px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-lg">
+            <FaStar className="text-yellow-500 text-xs" />
+            <span className="text-xs font-bold text-gray-800 dark:text-white">
+                {displayRating}
+            </span>
           </div>
 
           <div className="absolute bottom-3 left-3 z-20">
@@ -63,11 +75,12 @@ const LibraryCard = ({ library }) => {
             <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
               {name}
             </h3>
+            
+            {/* Rating in Content Area (Updated Logic) */}
             <div className="flex items-center gap-1 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 px-2 py-1 rounded-lg">
               <span className="text-yellow-500 dark:text-yellow-400 text-xs">★</span>
-              {/* Dynamic Rating Logic */}
               <span className="text-xs font-bold text-gray-700 dark:text-gray-200">
-                {averageRating > 0 ? averageRating.toFixed(1) : "New"}
+                {displayRating} {/* ✅ Shows "N/A" if 0 */}
               </span>
               {totalReviews > 0 && (
                 <span className="text-[10px] text-gray-400 ml-0.5">({totalReviews})</span>

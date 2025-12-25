@@ -24,7 +24,7 @@ const LibrarySearch = ({ onSearch, setLoading }) => {
 
     try {
       // Call Backend API
-      const response = await axios.get(`http://localhost:8080/api/libraries/search?query=${searchTerm}`);
+      const response = await axios.get(`https://libhub-6izs.onrender.com/api/libraries/search?query=${searchTerm}`);
       
       // Pass data to Home (Home will handle turning off the Skeletons)
       onSearch(response.data); 

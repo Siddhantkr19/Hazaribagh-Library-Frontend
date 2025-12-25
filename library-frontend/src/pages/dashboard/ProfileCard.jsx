@@ -5,7 +5,7 @@ const ProfileCard = ({ user, uploading, uploadStatus, handleImageChange, trigger
   const getProfileImage = () => {
     if (!user.profilePicture) return null;
     if (user.profilePicture.startsWith("http")) return user.profilePicture;
-    return `http://localhost:8080${user.profilePicture}`; 
+    return `https://libhub-6izs.onrender.com${user.profilePicture}`; 
   };
 
   return (

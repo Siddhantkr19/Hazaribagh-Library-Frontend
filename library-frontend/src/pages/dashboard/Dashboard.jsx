@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// ✅ FIX: Go up TWO levels (../../) because we are now in src/pages/dashboard/
 import { useAuth } from '../../context/AuthContext'; 
 import bookingApi from '../../services/bookingApi'; 
 import profilePictureService from '../../services/profilePicture';
-import axios from 'axios';
+import adminApi from '../../services/adminApi'; 
+// ✅ ADDED Icons for notifications
+import { CheckCircle, XCircle } from 'lucide-react'; 
 
-// Import New Sub-Components
+// Import Sub-Components
 import ActiveSubscriptions from './ActiveSubscriptions';
 import RecentTransactions from './RecentTransactions';
 import ProfileCard from './ProfileCard';
@@ -29,6 +30,9 @@ const Dashboard = () => {
   const [helpMessage, setHelpMessage] = useState("");
   const [isSendingHelp, setIsSendingHelp] = useState(false);
 
+  // ✅ NEW: Notification State
+  const [notification, setNotification] = useState(null);
+
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -49,6 +53,15 @@ const Dashboard = () => {
     };
     fetchDashboardData();
   }, [user]);
+
+  // ✅ NEW: Helper function to show notifications
+  const showNotification = (type, message) => {
+    setNotification({ type, message });
+    // Auto-hide after 4 seconds
+    setTimeout(() => {
+        setNotification(null);
+    }, 4000);
+  };
 
   const handleLogout = async () => {
     try {
@@ -98,21 +111,23 @@ const Dashboard = () => {
 
     setIsSendingHelp(true);
     try {
-        await axios.post('http://localhost:8080/api/help/submit', {
+        // Use adminApi to automatically handle cookies/credentials
+        await adminApi.post('/help/submit', {
             userEmail: user.email,
             subject: helpSubject,
-            message: helpMessage,
+            message: helpMessage, 
             bookingId: activeBookings.length > 0 ? activeBookings[0].bookingId : null 
-        }, {
-             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
 
-        alert("Ticket submitted successfully! Admin will review your request.");
+        // ✅ REPLACED ALERT WITH NOTIFICATION
+        showNotification('success', "Ticket submitted successfully! Admin will review your request.");
+        
         setShowHelpModal(false);
         setHelpMessage("");
     } catch (error) {
         console.error("Help submit error", error);
-        alert("Failed to send request. Please try again.");
+        // ✅ REPLACED ALERT WITH NOTIFICATION
+        showNotification('error', "Failed to send request. Please try again.");
     } finally {
         setIsSendingHelp(false);
     }
@@ -121,8 +136,29 @@ const Dashboard = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 pt-24 pb-12 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-300">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 pt-24 pb-12 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-300 relative">
       
+      {/* ✅ NEW: Dynamic Notification Toast (Top Center) */}
+      {notification && (
+        <div className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-[60] flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-md border animate-in slide-in-from-top-4 duration-300 ${
+            notification.type === 'success' 
+            ? 'bg-green-500/90 border-green-400/50 text-white' 
+            : 'bg-red-500/90 border-red-400/50 text-white'
+        }`}>
+            {notification.type === 'success' ? <CheckCircle size={24} /> : <XCircle size={24} />}
+            <div>
+                <h4 className="font-bold text-sm uppercase tracking-wider">
+                    {notification.type === 'success' ? 'Success' : 'Error'}
+                </h4>
+                <p className="font-medium text-sm opacity-90">{notification.message}</p>
+            </div>
+            {/* Close Button */}
+            <button onClick={() => setNotification(null)} className="ml-4 opacity-70 hover:opacity-100">
+                <XCircle size={18} />
+            </button>
+        </div>
+      )}
+
       {/* Background Decor */}
       <div className="fixed inset-0 z-0 pointer-events-none opacity-0 dark:opacity-100 transition-opacity">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl"></div>

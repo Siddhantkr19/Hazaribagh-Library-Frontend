@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Ensure this matches your backend URL exactly
-const API_URL = 'http://localhost:8080/api/auth';
+const API_URL = 'https://libhub-6izs.onrender.com/api/auth';
 
 const uploadProfilePicture = async (userEmail, file) => {
   const formData = new FormData();

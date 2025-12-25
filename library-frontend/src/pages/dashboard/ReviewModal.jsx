@@ -35,7 +35,7 @@ const ReviewModal = ({ isOpen, onClose, booking, userEmail, onSuccess }) => {
     setSubmitting(true);
 
     try {
-      await axios.post('http://localhost:8080/api/reviews/submit', payload, {
+      await axios.post('https://libhub-6izs.onrender.com/api/reviews/submit', payload, {
         withCredentials: true
       });
 

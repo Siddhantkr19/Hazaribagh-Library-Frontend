@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import adminApi from '../../services/adminApi';
-import { Star, Eye, EyeOff, MessageSquare, Filter, ShieldCheck, TrendingUp, Users } from 'lucide-react';
+import { Star, Eye, EyeOff, MessageSquare, Filter, ShieldCheck } from 'lucide-react';
 
 const AdminReviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -22,7 +22,7 @@ const AdminReviews = () => {
     }
   };
 
-  const toggleVisibility = async (reviewId, currentStatus) => {
+  const toggleVisibility = async (reviewId) => {
     try {
       const res = await adminApi.put(`/reviews/admin/toggle-visibility/${reviewId}`, null);
       if (res.status === 200) {
@@ -41,7 +41,6 @@ const AdminReviews = () => {
     ? reviews 
     : reviews.filter(r => r.rating === filterRating);
 
-  // Stats Logic
   const stats = {
     total: reviews.length,
     avg: reviews.length > 0 ? (reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length).toFixed(1) : 0,
@@ -51,14 +50,14 @@ const AdminReviews = () => {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       
-      {/* 1. Dashboard Stats Row */}
+      {/* 1. Dashboard Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard icon={<MessageSquare className="text-blue-400" />} label="Total Reviews" value={stats.total} />
         <StatCard icon={<Star className="text-yellow-400" />} label="Average Rating" value={`${stats.avg} / 5`} />
         <StatCard icon={<ShieldCheck className="text-red-400" />} label="Hidden Reviews" value={stats.hidden} />
       </div>
 
-      {/* 2. Enhanced Header & Filters */}
+      {/* 2. Header & Filters */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-6 bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl">
         <div className="text-center md:text-left">
           <h2 className="text-3xl font-black text-white tracking-tight">Feedback Hub</h2>
@@ -80,7 +79,7 @@ const AdminReviews = () => {
         </div>
       </div>
 
-      {/* 3. Modernized Reviews List */}
+      {/* 3. Reviews List */}
       <div className="grid grid-cols-1 gap-6">
         {loading ? (
             <div className="flex flex-col items-center justify-center py-20 text-gray-500">
@@ -129,7 +128,7 @@ const AdminReviews = () => {
                         </div>
 
                         <button 
-                            onClick={() => toggleVisibility(review.id, review.isVisible)}
+                            onClick={() => toggleVisibility(review.id)}
                             className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all ${
                                 review.isVisible 
                                 ? 'bg-white/5 text-gray-400 hover:bg-red-600/10 hover:text-red-500' 
@@ -140,10 +139,29 @@ const AdminReviews = () => {
                         </button>
                     </div>
 
-                    <div className="mt-6 bg-black/40 p-6 rounded-2xl text-gray-300 text-sm border border-white/5 relative italic leading-relaxed">
-                        <MessageSquare size={14} className="text-gray-600 absolute -top-2 -left-2 bg-gray-900 p-0.5 rounded shadow" />
-                        "{review.comment}"
+                    {/* ✅ FIXED COMMENT SECTION LOGIC */}
+                    <div className={`mt-6 p-6 rounded-2xl border transition-all duration-300 ${
+                        review.isVisible 
+                        ? 'bg-black/40 border-white/5 text-gray-300' 
+                        : 'bg-red-950/10 border-red-500/10 text-red-400/50 italic'
+                    }`}>
+                        <div className="relative">
+                            <MessageSquare size={14} className={`absolute -top-1 -left-2 p-0.5 rounded shadow ${
+                                review.isVisible ? 'text-gray-600 bg-gray-900' : 'text-red-900 bg-red-950'
+                            }`} />
+                            
+                            {/* IF VISIBLE -> SHOW COMMENT. IF HIDDEN -> SHOW MESSAGE */}
+                            {review.isVisible ? (
+                                <span className="leading-relaxed">"{review.comment}"</span>
+                            ) : (
+                                <span className="flex items-center gap-2 font-bold text-xs uppercase tracking-widest opacity-60">
+                                    <EyeOff size={12} />
+                                    Content Hidden by Admin
+                                </span>
+                            )}
+                        </div>
                     </div>
+
                 </div>
             ))
         ) : (
@@ -157,7 +175,6 @@ const AdminReviews = () => {
   );
 };
 
-// Helper Component for Stats
 const StatCard = ({ icon, label, value }) => (
     <div className="bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-md flex items-center gap-4">
         <div className="p-4 bg-black/40 rounded-2xl border border-white/5">

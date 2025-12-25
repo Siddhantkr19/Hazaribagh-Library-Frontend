@@ -13,7 +13,7 @@ const AllLibraries = () => {
   useEffect(() => {
     const fetchLibraries = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/libraries');
+        const response = await axios.get('https://libhub-6izs.onrender.com/api/libraries');
         
         const formattedData = response.data.map(lib => ({
             id: lib.id,
@@ -22,7 +22,7 @@ const AllLibraries = () => {
             seats: lib.totalSeats || 0,
             price: lib.offerPrice,
             oldPrice: lib.originalPrice,
-            // Mapping dynamic rating fields from backend
+            // ✅ Ensures if null, it defaults to 0 (which LibraryCard displays as "N/A")
             averageRating: lib.averageRating || 0, 
             totalReviews: lib.totalReviews || 0,
             amenities: lib.amenities || ["WiFi", "AC"], 
@@ -40,6 +40,8 @@ const AllLibraries = () => {
     fetchLibraries();
   }, []);
 
+  // ... (rest of the filtering logic and return matches your original code)
+  
   useEffect(() => {
     let result = libraries;
     if (activeFilter === 'Matwari') result = result.filter(lib => lib.location.toLowerCase().includes('matwari'));

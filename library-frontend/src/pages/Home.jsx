@@ -78,7 +78,7 @@ const Home = () => {
   useEffect(() => {
     const fetchTrendingLibraries = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/libraries');
+        const response = await axios.get('https://libhub-6izs.onrender.com/api/libraries');
         const formattedData = mapBackendDataToFrontend(response.data);
         setTrendingLibraries(formattedData.slice(0, 5)); 
         setLoading(false);
@@ -112,7 +112,7 @@ const Home = () => {
           <img 
             src="Background Image.jpg" 
             alt="Hazaribagh Study Center" 
-            className="w-full h-full object-cover brightness-120"
+            className="w-full h-full object-cover brightness-100"
           />
           {/* Overlay Adjustment */}
           <div className="absolute inset-0 bg-black/50 dark:bg-black/60"></div>

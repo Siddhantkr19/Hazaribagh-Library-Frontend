@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-// ✅ ADDED: Star and MessageSquare for the review UI
+// ✅ Uses Lucide icons (Star, MessageSquare, etc.) to match your existing style
 import { Star, MessageSquare, MapPin, Clock, CheckCircle } from 'lucide-react';
 
 const LibraryDetails = () => {
@@ -9,7 +9,7 @@ const LibraryDetails = () => {
   const navigate = useNavigate(); 
   
   const [library, setLibrary] = useState(null);
-  const [reviews, setReviews] = useState([]); // ✅ NEW: State for reviews
+  const [reviews, setReviews] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,11 +17,11 @@ const LibraryDetails = () => {
     const fetchLibraryDetails = async () => {
       try {
         // 1. Fetch Library Info
-        const libResponse = await axios.get(`http://localhost:8080/api/libraries/${id}`);
+        const libResponse = await axios.get(`https://libhub-6izs.onrender.com/api/libraries/${id}`);
         setLibrary(libResponse.data);
 
-        // 2. ✅ NEW: Fetch Public Reviews
-        const reviewResponse = await axios.get(`http://localhost:8080/api/reviews/library/${id}`);
+        // 2. Fetch Public Reviews
+        const reviewResponse = await axios.get(`https://libhub-6izs.onrender.com/api/reviews/library/${id}`);
         setReviews(reviewResponse.data);
 
         setLoading(false);
@@ -42,6 +42,11 @@ const LibraryDetails = () => {
   const mainImage = (library.images && library.images.length > 0) 
     ? library.images[0] 
     : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop";
+
+  // ✅ CRITICAL FIX: Define the ratingValue variable here!
+  // This safely checks for 'averageRating' (Java default) OR 'average_rating' (DB default)
+  const ratingValue = library.averageRating || library.average_rating || 0;
+  
 
   return (
     <div className="min-h-screen pt-28 pb-12 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -80,7 +85,7 @@ const LibraryDetails = () => {
                 )}
             </div>
 
-            {/* ✅ NEW: STUDENT REVIEWS SECTION */}
+            {/* REVIEWS SECTION */}
             <div className="space-y-6">
                 <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4">
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
@@ -135,19 +140,20 @@ const LibraryDetails = () => {
           {/* RIGHT COLUMN: Details */}
           <div className="bg-white dark:bg-gray-800/50 backdrop-blur-xl p-8 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/50 dark:shadow-none sticky top-28">
             
-            {/* Title & Static Rating Header */}
+            {/* Title & Rating Header */}
             <div className="flex justify-between items-start mb-6">
                 <div>
                     <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">{library.name}</h1>
                     <p className="text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                        🗺️ {library.address || "Address not available"}
+                        <MapPin size={16} /> {library.address || "Address not available"}
                     </p>
                 </div>
                 
-                {/* ✅ NEW: AVG RATING BADGE */}
+                {/* ✅ AVG RATING BADGE */}
                 <div className="text-center bg-blue-50 dark:bg-blue-900/20 p-3 rounded-2xl border border-blue-100 dark:border-blue-800/50">
                     <p className="text-2xl font-black text-blue-600 dark:text-blue-400 flex items-center gap-1 justify-center">
-                        {library.averageRating > 0 ? library.averageRating.toFixed(1) : "N/A"}
+                        {/* We use the variable 'ratingValue' that we defined above */}
+                        {ratingValue > 0 ? Number(ratingValue) : "N/A"}
                         <Star size={20} className="fill-blue-600 dark:fill-blue-400" />
                     </p>
                     <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mt-1">Rating</p>
@@ -172,7 +178,9 @@ const LibraryDetails = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                 <div className="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-100 dark:border-gray-600/50">
                     <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Opening Hours</p>
-                    <p className="text-gray-900 dark:text-white font-semibold">🕒 {library.openingHours || "6 AM - 10 PM"}</p>
+                    <p className="text-gray-900 dark:text-white font-semibold flex items-center gap-2">
+                        <Clock size={16} /> {library.openingHours || "6 AM - 10 PM"}
+                    </p>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-100 dark:border-gray-600/50">
                     <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Owner Contact</p>
@@ -186,8 +194,8 @@ const LibraryDetails = () => {
                 <div className="flex flex-wrap gap-3">
                     {library.amenities && library.amenities.length > 0 ? (
                         library.amenities.map((item, index) => (
-                            <span key={index} className="px-3 py-1.5 bg-blue-50 dark:bg-blue-600/20 text-blue-600 dark:text-blue-300 rounded-lg text-sm font-medium border border-blue-100 dark:border-blue-500/30">
-                                ✓ {item}
+                            <span key={index} className="px-3 py-1.5 bg-blue-50 dark:bg-blue-600/20 text-blue-600 dark:text-blue-300 rounded-lg text-sm font-medium border border-blue-100 dark:border-blue-500/30 flex items-center gap-1">
+                                <CheckCircle size={14} /> {item}
                             </span>
                         ))
                     ) : (

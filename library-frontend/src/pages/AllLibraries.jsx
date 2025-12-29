@@ -10,6 +10,32 @@ const AllLibraries = () => {
   const [searchQuery, setSearchQuery] = useState('');   
   const [activeFilter, setActiveFilter] = useState('All'); 
 
+  // 🛠️ HELPER: Converts "Air Conditioning" -> "AC" and cleans Java Strings
+  const getShortAmenityName = (backendItem) => {
+      // 1. Get the raw string (Handle if it's an object or string)
+      let name = backendItem.name || backendItem; 
+
+      // 2. Fix the "LIBRARYAMENITY(ID=5, NAME=WI-FI)" issue
+      if (typeof name === 'string' && name.includes('NAME=')) {
+          const match = name.match(/NAME=([^,)]+)/); // Regex to grab text after NAME=
+          if (match) name = match[1];
+      }
+
+      // 3. Map to Short Names (Standardize)
+      const lowerName = name.toString().toLowerCase().trim();
+      
+      if (lowerName.includes('wi-fi') || lowerName.includes('wifi')) return 'Wi-Fi';
+      if (lowerName.includes('air conditioning') || lowerName.includes('ac')) return 'AC';
+      if (lowerName.includes('water')) return 'Water';
+      if (lowerName.includes('locker')) return 'Locker';
+      if (lowerName.includes('cctv')) return 'CCTV';
+      if (lowerName.includes('power') || lowerName.includes('backup')) return 'Power';
+      if (lowerName.includes('parking')) return 'Parking';
+      if (lowerName.includes('discussion')) return 'Room';
+
+      return name; // Return original if no match found (e.g., "New Feature")
+  };
+
   useEffect(() => {
     const fetchLibraries = async () => {
       try {
@@ -22,10 +48,14 @@ const AllLibraries = () => {
             seats: lib.totalSeats || 0,
             price: lib.offerPrice,
             oldPrice: lib.originalPrice,
-            // ✅ Ensures if null, it defaults to 0 (which LibraryCard displays as "N/A")
             averageRating: lib.averageRating || 0, 
             totalReviews: lib.totalReviews || 0,
-            amenities: lib.amenities || ["WiFi", "AC"], 
+            
+            // ✅ CLEAN THE AMENITIES HERE BEFORE SENDING TO CARD
+            amenities: (lib.amenities && lib.amenities.length > 0) 
+                ? lib.amenities.map(item => getShortAmenityName(item)) 
+                : ["Wi-Fi", "AC"], 
+
             image: (lib.images && lib.images.length > 0) ? lib.images[0] : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop"
         }));
         setLibraries(formattedData);
@@ -40,14 +70,13 @@ const AllLibraries = () => {
     fetchLibraries();
   }, []);
 
-  // ... (rest of the filtering logic and return matches your original code)
-  
+  // --- FILTERS LOGIC ---
   useEffect(() => {
     let result = libraries;
     if (activeFilter === 'Matwari') result = result.filter(lib => lib.location.toLowerCase().includes('matwari'));
     else if (activeFilter === 'Korrah') result = result.filter(lib => lib.location.toLowerCase().includes('korrah'));
     else if (activeFilter === 'Under 400') result = result.filter(lib => lib.price <= 400);
-    else if (activeFilter === 'AC') result = result.filter(lib => lib.amenities.includes('AC'));
+    else if (activeFilter === 'AC') result = result.filter(lib => lib.amenities.includes('AC')); 
 
     if (searchQuery) {
         const lowerQuery = searchQuery.toLowerCase();
@@ -71,10 +100,8 @@ const AllLibraries = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 font-sans">
-      
       <div className="relative z-10 pt-28 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header */}
         <div className="mb-8 text-center animate-in fade-in slide-in-from-bottom-8 duration-700">
           <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-4">
             Explore All Libraries
@@ -84,17 +111,12 @@ const AllLibraries = () => {
           </p>
         </div>
 
-        {/* --- SEARCH & FILTERS SECTION --- */}
+        {/* Search & Filters */}
         <div className="max-w-4xl mx-auto mb-12 space-y-6">
-            
             <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl opacity-30 group-hover:opacity-60 blur transition duration-500"></div>
                 <div className="relative flex items-center bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-blue-300 dark:border-gray-700 shadow-lg shadow-blue-200/50 dark:shadow-none">
-                    <span className="pl-4 text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </span>
+                    <span className="pl-4 text-gray-400">🔍</span>
                     <input 
                         type="text"
                         placeholder="Search by library name, location..."
@@ -117,7 +139,7 @@ const AllLibraries = () => {
             </div>
         </div>
 
-        {/* --- RESULTS SECTION --- */}
+        {/* Results */}
         {loading && (
              <div className="text-center py-20">
                  <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>

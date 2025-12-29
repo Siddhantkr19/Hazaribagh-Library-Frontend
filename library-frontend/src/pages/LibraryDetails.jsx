@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { Star, MessageSquare, MapPin, Clock, CheckCircle } from 'lucide-react';
+import { Star, MessageSquare, MapPin, Clock, CheckCircle, Wifi, Zap, Droplets, Lock, ShieldCheck, Car } from 'lucide-react';
 
 const LibraryDetails = () => {
   const { id } = useParams(); 
@@ -15,14 +15,10 @@ const LibraryDetails = () => {
   useEffect(() => {
     const fetchLibraryDetails = async () => {
       try {
-        // 1. Fetch Library Info
         const libResponse = await api.get(`/libraries/${id}`);
         setLibrary(libResponse.data);
-
-        // 2. Fetch Public Reviews
         const reviewResponse = await api.get(`/reviews/library/${id}`);
         setReviews(reviewResponse.data);
-
         setLoading(false);
       } catch (err) {
         console.error("Error fetching details:", err);
@@ -30,7 +26,6 @@ const LibraryDetails = () => {
         setLoading(false);
       }
     };
-
     fetchLibraryDetails();
   }, [id]);
 
@@ -42,10 +37,30 @@ const LibraryDetails = () => {
     ? library.images[0].url
     : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop";
 
-  // ✅ CRITICAL FIX: Define the ratingValue variable here!
-  // This safely checks for 'averageRating' (Java default) OR 'average_rating' (DB default)
   const ratingValue = library.averageRating || library.average_rating || 0;
-  
+
+  // 🛠️ HELPER: Display correct Icon and Short Name
+  const getAmenityConfig = (amenityItem) => {
+    // 1. Clean the name (Handle "LIBRARYAMENITY..." etc)
+    let name = amenityItem.name || amenityItem;
+    if (typeof name === 'string' && name.includes('NAME=')) {
+        const match = name.match(/NAME=([^,)]+)/);
+        if (match) name = match[1];
+    }
+    const lowerName = name.toString().toLowerCase().trim();
+
+    // 2. Return Config based on name
+    if (lowerName.includes('wi-fi') || lowerName.includes('wifi')) return { label: 'Wi-Fi', icon: <Wifi size={14} /> };
+    if (lowerName.includes('air conditioning') || lowerName.includes('ac')) return { label: 'AC', icon: <Zap size={14} /> };
+    if (lowerName.includes('water')) return { label: 'Water', icon: <Droplets size={14} /> };
+    if (lowerName.includes('locker')) return { label: 'Locker', icon: <Lock size={14} /> };
+    if (lowerName.includes('cctv')) return { label: 'CCTV', icon: <ShieldCheck size={14} /> };
+    if (lowerName.includes('power') || lowerName.includes('backup')) return { label: 'Power', icon: <Zap size={14} /> };
+    if (lowerName.includes('parking')) return { label: 'Parking', icon: <Car size={14} /> };
+
+    // Default
+    return { label: name, icon: <CheckCircle size={14} /> };
+  };
 
   return (
     <div className="min-h-screen pt-28 pb-12 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -57,24 +72,17 @@ const LibraryDetails = () => {
           &larr; Back to Libraries
         </Link>
 
-        {/* --- MAIN CONTENT GRID --- */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           
           {/* LEFT COLUMN: Images & Reviews */}
           <div className="space-y-12">
             <div className="space-y-4">
                 <div className="rounded-3xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700 h-96 relative group">
-                <img 
-                    src={mainImage} 
-                    alt={library.name} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                />
+                <img src={mainImage} alt={library.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute top-4 left-4 bg-white/90 dark:bg-black/60 backdrop-blur-md px-4 py-1 rounded-full text-sm font-bold border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white shadow-lg">
                     📍 {library.locationTag || "Hazaribagh"}
                 </div>
                 </div>
-                
-                {/* Gallery Preview */}
                 {library.images && library.images.length > 1 && (
                     <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                         {library.images.slice(1).map((img, idx) => (
@@ -112,17 +120,11 @@ const LibraryDetails = () => {
                                     </div>
                                     <div className="flex gap-0.5">
                                         {[...Array(5)].map((_, i) => (
-                                            <Star 
-                                                key={i} 
-                                                size={14} 
-                                                className={i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200 dark:text-gray-700"} 
-                                            />
+                                            <Star key={i} size={14} className={i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200 dark:text-gray-700"} />
                                         ))}
                                     </div>
                                 </div>
-                                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed italic">
-                                    "{review.comment}"
-                                </p>
+                                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed italic">"{review.comment}"</p>
                             </div>
                         ))
                     ) : (
@@ -138,8 +140,6 @@ const LibraryDetails = () => {
 
           {/* RIGHT COLUMN: Details */}
           <div className="bg-white dark:bg-gray-800/50 backdrop-blur-xl p-8 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/50 dark:shadow-none sticky top-28">
-            
-            {/* Title & Rating Header */}
             <div className="flex justify-between items-start mb-6">
                 <div>
                     <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-2">{library.name}</h1>
@@ -147,11 +147,8 @@ const LibraryDetails = () => {
                         <MapPin size={16} /> {library.address || "Address not available"}
                     </p>
                 </div>
-                
-                {/* ✅ AVG RATING BADGE */}
                 <div className="text-center bg-blue-50 dark:bg-blue-900/20 p-3 rounded-2xl border border-blue-100 dark:border-blue-800/50">
                     <p className="text-2xl font-black text-blue-600 dark:text-blue-400 flex items-center gap-1 justify-center">
-                        {/* We use the variable 'ratingValue' that we defined above */}
                         {ratingValue > 0 ? Number(ratingValue) : "N/A"}
                         <Star size={20} className="fill-blue-600 dark:fill-blue-400" />
                     </p>
@@ -159,7 +156,6 @@ const LibraryDetails = () => {
                 </div>
             </div>
 
-            {/* Price Card */}
             <div className="bg-blue-50 dark:bg-gray-900/80 rounded-2xl p-6 mb-8 border border-blue-100 dark:border-gray-700 flex justify-between items-center">
                 <div>
                     <p className="text-gray-400 dark:text-gray-500 text-sm line-through">₹{library.originalPrice}</p>
@@ -173,7 +169,6 @@ const LibraryDetails = () => {
                 </div>
             </div>
 
-            {/* Info Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                 <div className="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-100 dark:border-gray-600/50">
                     <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Opening Hours</p>
@@ -187,23 +182,25 @@ const LibraryDetails = () => {
                 </div>
             </div>
 
-            {/* Amenities List */}
+            {/* ✅ FIXED AMENITIES LIST */}
             <div className="mb-8">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Amenities</h3>
                 <div className="flex flex-wrap gap-3">
                     {library.amenities && library.amenities.length > 0 ? (
-                        library.amenities.map((item, index) => (
-                            <span key={index} className="px-3 py-1.5 bg-blue-50 dark:bg-blue-600/20 text-blue-600 dark:text-blue-300 rounded-lg text-sm font-medium border border-blue-100 dark:border-blue-500/30 flex items-center gap-1">
-                                <CheckCircle size={14} /> {item.name}
-                            </span>
-                        ))
+                        library.amenities.map((item, index) => {
+                            const { label, icon } = getAmenityConfig(item);
+                            return (
+                                <span key={index} className="px-3 py-1.5 bg-blue-50 dark:bg-blue-600/20 text-blue-600 dark:text-blue-300 rounded-lg text-sm font-medium border border-blue-100 dark:border-blue-500/30 flex items-center gap-1">
+                                    {icon} {label}
+                                </span>
+                            );
+                        })
                     ) : (
                         <span className="text-gray-500">No specific amenities listed.</span>
                     )}
                 </div>
             </div>
 
-            {/* Action Button */}
             <button 
                 onClick={() => navigate(`/book/${library.id}`)}
                 className="w-full py-4 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold text-xl rounded-xl shadow-lg shadow-orange-500/20 transform transition hover:-translate-y-1 active:scale-95"

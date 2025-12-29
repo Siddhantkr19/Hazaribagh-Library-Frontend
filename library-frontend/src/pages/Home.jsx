@@ -3,7 +3,7 @@ import LibrarySearch from '../components/LibrarySearch';
 import LibraryCard from '../components/LibraryCard';
 import WelcomeOffer from '../components/WelcomeOffer';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 
 const Home = () => {
   const [trendingLibraries, setTrendingLibraries] = useState([]);
@@ -78,7 +78,7 @@ const Home = () => {
   useEffect(() => {
     const fetchTrendingLibraries = async () => {
       try {
-        const response = await axios.get('https://libhub-6izs.onrender.com/api/libraries');
+        const response = await api.get('/libraries');
         const formattedData = mapBackendDataToFrontend(response.data);
         setTrendingLibraries(formattedData.slice(0, 5)); 
         setLoading(false);

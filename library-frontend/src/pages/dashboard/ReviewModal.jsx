@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Star, X, Send } from 'lucide-react';
-import axios from 'axios';
+import api from '../../services/api';
 
 const ReviewModal = ({ isOpen, onClose, booking, userEmail, onSuccess }) => {
   const [rating, setRating] = useState(0);
@@ -35,9 +35,7 @@ const ReviewModal = ({ isOpen, onClose, booking, userEmail, onSuccess }) => {
     setSubmitting(true);
 
     try {
-      await axios.post('https://libhub-6izs.onrender.com/api/reviews/submit', payload, {
-        withCredentials: true
-      });
+      await api.post('/reviews/submit', payload);
 
       // success feedback inside modal
       setSuccessMessage('Thanks — your review has been submitted!');

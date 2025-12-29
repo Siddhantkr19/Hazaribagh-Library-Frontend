@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-// ✅ Uses Lucide icons (Star, MessageSquare, etc.) to match your existing style
+import api from '../../services/api';
 import { Star, MessageSquare, MapPin, Clock, CheckCircle } from 'lucide-react';
 
 const LibraryDetails = () => {
@@ -17,11 +16,11 @@ const LibraryDetails = () => {
     const fetchLibraryDetails = async () => {
       try {
         // 1. Fetch Library Info
-        const libResponse = await axios.get(`https://libhub-6izs.onrender.com/api/libraries/${id}`);
+        const libResponse = await api.get(`/libraries/${id}`);
         setLibrary(libResponse.data);
 
         // 2. Fetch Public Reviews
-        const reviewResponse = await axios.get(`https://libhub-6izs.onrender.com/api/reviews/library/${id}`);
+        const reviewResponse = await api.get(`/reviews/library/${id}`);
         setReviews(reviewResponse.data);
 
         setLoading(false);

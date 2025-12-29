@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; 
+import api from '../services/api';
 import LibraryCard from '../components/LibraryCard';
 
 const AllLibraries = () => {
@@ -13,7 +13,7 @@ const AllLibraries = () => {
   useEffect(() => {
     const fetchLibraries = async () => {
       try {
-        const response = await axios.get('https://libhub-6izs.onrender.com/api/libraries');
+        const response = await api.get('/libraries');
         
         const formattedData = response.data.map(lib => ({
             id: lib.id,

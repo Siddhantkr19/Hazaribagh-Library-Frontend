@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 
 // Receive "setLoading" to trigger Skeletons in Home.jsx
 const LibrarySearch = ({ onSearch, setLoading }) => {
@@ -24,7 +24,7 @@ const LibrarySearch = ({ onSearch, setLoading }) => {
 
     try {
       // Call Backend API
-      const response = await axios.get(`https://libhub-6izs.onrender.com/api/libraries/search?query=${searchTerm}`);
+      const response = await api.get(`/libraries/search?query=${searchTerm}`);
       
       // Pass data to Home (Home will handle turning off the Skeletons)
       onSearch(response.data); 

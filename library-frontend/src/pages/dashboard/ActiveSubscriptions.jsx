@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
-import axios from 'axios';
+import api from '../../services/api';
 import ReviewModal from './ReviewModal';
 import { useAuth } from '../../context/AuthContext';
 
@@ -33,9 +33,8 @@ const ActiveSubscriptions = ({ bookings, loading }) => {
   const handleRateClick = async (booking) => {
     setChecking(true);
     try {
-      const response = await axios.get(
-        `https://libhub-6izs.onrender.com/api/reviews/check-eligibility?bookingId=${booking.bookingId}`,
-        { withCredentials: true }
+      const response = await api.get(
+        `/reviews/check-eligibility?bookingId=${booking.bookingId}`
       );
 
       if (response.data.canReview) {

@@ -1,30 +1,78 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; 
-import { FaWifi, FaGlassWater, FaBolt, FaChair, FaStar } from "react-icons/fa6"; // ✅ Added FaStar
+import { FaWifi, FaGlassWater, FaBolt, FaChair, FaStar, FaCar } from "react-icons/fa6"; 
 import { TbAirConditioning, TbAirConditioningDisabled } from "react-icons/tb";
 import { MdOutlineSecurity, MdMeetingRoom } from "react-icons/md";
 import { BiCctv } from "react-icons/bi";
 
 const LibraryCard = ({ library }) => {
-  // Destructure including new rating fields from backend
-  const { id, name, location, seats, price, oldPrice, image, amenities, averageRating, totalReviews } = library;
+  // Destructure with safe defaults to prevent crash if amenities is null
+  const { 
+    id, 
+    name, 
+    location, 
+    seats, 
+    price, 
+    oldPrice, 
+    image, 
+    amenities = [], // Default to empty array
+    averageRating, 
+    totalReviews 
+  } = library;
+
   const navigate = useNavigate(); 
 
-  const getAmenityConfig = (text) => {
-    const lowerText = text.toLowerCase();
-    if (lowerText.includes('wifi')) return { icon: <FaWifi />, label: 'WiFi', color: 'text-blue-500 dark:text-blue-400' };
-    if (lowerText.includes('non ac')) return { icon: <TbAirConditioningDisabled />, label: 'Non AC', color: 'text-gray-500 dark:text-gray-400' };
-    if (lowerText.includes('ac')) return { icon: <TbAirConditioning />, label: 'AC', color: 'text-cyan-600 dark:text-cyan-300' };
-    if (lowerText.includes('water')) return { icon: <FaGlassWater />, label: 'RO Water', color: 'text-blue-600 dark:text-blue-300' };
-    if (lowerText.includes('power') || lowerText.includes('backup')) return { icon: <FaBolt />, label: 'Backup', color: 'text-yellow-600 dark:text-yellow-400' };
-    if (lowerText.includes('cctv')) return { icon: <BiCctv />, label: 'CCTV', color: 'text-red-500 dark:text-red-300' };
-    if (lowerText.includes('security')) return { icon: <MdOutlineSecurity />, label: 'Security', color: 'text-green-600 dark:text-green-300' };
-    if (lowerText.includes('discussion')) return { icon: <MdMeetingRoom />, label: 'Room', color: 'text-purple-600 dark:text-purple-300' };
-    return { icon: <FaChair />, label: text, color: 'text-gray-500 dark:text-gray-300' };
+  // 🛠️ HELPER: Cleans "Dirty" Java Data and returns Icon + Label
+  const getAmenityConfig = (amenityItem) => {
+    // 1. Get the name whether it's an object or a string
+    let rawName = amenityItem.name || amenityItem;
+
+    // 2. ✨ MAGIC FIX: Detect if it's that ugly "LIBRARYAMENITY(ID=...)" string
+    if (typeof rawName === 'string' && rawName.includes('NAME=')) {
+        // Extracts the text between "NAME=" and the next comma or closing parenthesis
+        const match = rawName.match(/NAME=([^,)]+)/i);
+        if (match) {
+            rawName = match[1]; // Sets rawName to just "PARKING" (or whatever name)
+        }
+    }
+
+    // 3. Normalize to lowercase for keyword matching
+    const lowerText = rawName ? rawName.toString().toLowerCase().trim() : '';
+
+    // 4. Return correct Icon and Label based on keywords
+    if (lowerText.includes('wifi') || lowerText.includes('wi-fi')) 
+        return { icon: <FaWifi />, label: 'WiFi', color: 'text-blue-500 dark:text-blue-400' };
+    
+    if (lowerText.includes('non ac') || lowerText.includes('non-ac')) 
+        return { icon: <TbAirConditioningDisabled />, label: 'Non AC', color: 'text-gray-500 dark:text-gray-400' };
+    
+    if (lowerText.includes('ac') || lowerText.includes('air conditioning')) 
+        return { icon: <TbAirConditioning />, label: 'AC', color: 'text-cyan-600 dark:text-cyan-300' };
+    
+    if (lowerText.includes('water')) 
+        return { icon: <FaGlassWater />, label: 'RO Water', color: 'text-blue-600 dark:text-blue-300' };
+    
+    if (lowerText.includes('power') || lowerText.includes('backup')) 
+        return { icon: <FaBolt />, label: 'Backup', color: 'text-yellow-600 dark:text-yellow-400' };
+    
+    if (lowerText.includes('cctv')) 
+        return { icon: <BiCctv />, label: 'CCTV', color: 'text-red-500 dark:text-red-300' };
+    
+    if (lowerText.includes('security')) 
+        return { icon: <MdOutlineSecurity />, label: 'Security', color: 'text-green-600 dark:text-green-300' };
+    
+    if (lowerText.includes('discussion') || lowerText.includes('room')) 
+        return { icon: <MdMeetingRoom />, label: 'Room', color: 'text-purple-600 dark:text-purple-300' };
+    
+    if (lowerText.includes('parking')) 
+        return { icon: <FaCar />, label: 'Parking', color: 'text-gray-500 dark:text-gray-300' };
+
+    // Fallback: Return the CLEANED name (rawName), not the ugly one
+    return { icon: <FaChair />, label: rawName, color: 'text-gray-500 dark:text-gray-300' };
   };
 
-  // ✅ Helper for displaying rating
-  const displayRating = averageRating > 0 ? averageRating.toFixed(1) : "N/A";
+  // Helper for displaying rating
+  const displayRating = (averageRating && averageRating > 0) ? Number(averageRating).toFixed(1) : "N/A";
 
   return (
     <div 
@@ -43,7 +91,7 @@ const LibraryCard = ({ library }) => {
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
           
-          {/* ✅ MOVED "Seats Left" to TOP-LEFT */}
+          {/* Seats Left Badge */}
           <div className="absolute top-3 left-3 z-20 bg-white/90 dark:bg-black/60 backdrop-blur-md border border-red-200 dark:border-red-500/30 px-3 py-1 rounded-full flex items-center gap-2 shadow-lg">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -52,7 +100,7 @@ const LibraryCard = ({ library }) => {
             <span className="text-xs font-bold text-gray-800 dark:text-white tracking-wide">{seats} Left</span>
           </div>
 
-          {/* ✅ ADDED Rating Badge to TOP-RIGHT with Icon */}
+          {/* Rating Badge */}
           <div className="absolute top-3 right-3 z-20 bg-white/90 dark:bg-black/60 backdrop-blur-md border border-yellow-200 dark:border-yellow-500/30 px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-lg">
             <FaStar className="text-yellow-500 text-xs" />
             <span className="text-xs font-bold text-gray-800 dark:text-white">
@@ -76,11 +124,11 @@ const LibraryCard = ({ library }) => {
               {name}
             </h3>
             
-            {/* Rating in Content Area (Updated Logic) */}
+            {/* Rating in Content Area */}
             <div className="flex items-center gap-1 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 px-2 py-1 rounded-lg">
               <span className="text-yellow-500 dark:text-yellow-400 text-xs">★</span>
               <span className="text-xs font-bold text-gray-700 dark:text-gray-200">
-                {displayRating} {/* ✅ Shows "N/A" if 0 */}
+                {displayRating}
               </span>
               {totalReviews > 0 && (
                 <span className="text-[10px] text-gray-400 ml-0.5">({totalReviews})</span>
@@ -88,9 +136,10 @@ const LibraryCard = ({ library }) => {
             </div>
           </div>
 
-          {/* Amenities */}
+          {/* Amenities List */}
           <div className="flex flex-wrap gap-2 mb-5">
             {amenities.slice(0, 3).map((item, index) => {
+               // We pass the raw item, and getAmenityConfig cleans it!
                const config = getAmenityConfig(item);
                return (
                 <span key={index} className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">

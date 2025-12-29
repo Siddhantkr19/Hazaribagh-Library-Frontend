@@ -40,7 +40,7 @@ const LibraryDetails = () => {
   if (!library) return null;
 
   const mainImage = (library.images && library.images.length > 0) 
-    ? library.images[0] 
+    ? library.images[0].url
     : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop";
 
   // ✅ CRITICAL FIX: Define the ratingValue variable here!
@@ -79,7 +79,7 @@ const LibraryDetails = () => {
                 {library.images && library.images.length > 1 && (
                     <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                         {library.images.slice(1).map((img, idx) => (
-                            <img key={idx} src={img} alt="Gallery" className="w-24 h-24 rounded-xl object-cover border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-80 transition-opacity shadow-sm" />
+                            <img key={idx} src={img.url} alt="Gallery" className="w-24 h-24 rounded-xl object-cover border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-80 transition-opacity shadow-sm" />
                         ))}
                     </div>
                 )}
@@ -195,7 +195,7 @@ const LibraryDetails = () => {
                     {library.amenities && library.amenities.length > 0 ? (
                         library.amenities.map((item, index) => (
                             <span key={index} className="px-3 py-1.5 bg-blue-50 dark:bg-blue-600/20 text-blue-600 dark:text-blue-300 rounded-lg text-sm font-medium border border-blue-100 dark:border-blue-500/30 flex items-center gap-1">
-                                <CheckCircle size={14} /> {item}
+                                <CheckCircle size={14} /> {item.name}
                             </span>
                         ))
                     ) : (

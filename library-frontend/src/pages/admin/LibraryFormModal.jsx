@@ -107,8 +107,17 @@ const LibraryFormModal = ({ isOpen, onClose, libraryToEdit = null, onSuccess }) 
     setLoading(true);
 
     // Prepare payload (Convert numbers)
+    // 1. Convert ["Wi-Fi", "AC"]  --->  [{ name: "Wi-Fi" }, { name: "AC" }]
+    const formattedAmenities = formData.amenities.map(item => ({ name: item }));
+    // 2. ⚠️ NEW FIX: Fix Images mapping
+// Assuming your LibraryImage entity has a 'url' field
+
+const formattedImages = formData.images.map(imgUrl => ({ url: imgUrl }));
+
     const payload = {
       ...formData,
+      amenities: formattedAmenities,
+      images: formattedImages,
       originalPrice: Number(formData.originalPrice),
       offerPrice: Number(formData.offerPrice),
       totalSeats: Number(formData.totalSeats)

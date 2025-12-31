@@ -34,7 +34,7 @@ const LibraryDetails = () => {
   if (!library) return null;
 
   const mainImage = (library.images && library.images.length > 0) 
-    ? library.images[0].url
+    ? (library.images[0].imageUrl || library.images[0].url)
     : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop";
 
   const ratingValue = library.averageRating || library.average_rating || 0;

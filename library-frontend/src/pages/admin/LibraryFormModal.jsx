@@ -112,7 +112,7 @@ const LibraryFormModal = ({ isOpen, onClose, libraryToEdit = null, onSuccess }) 
     // 2. ⚠️ NEW FIX: Fix Images mapping
 // Assuming your LibraryImage entity has a 'url' field
 
-const formattedImages = formData.images.map(imgUrl => ({ url: imgUrl }));
+const formattedImages = formData.images.map(imgUrl => ({ imageUrl: imgUrl }));
 
     const payload = {
       ...formData,

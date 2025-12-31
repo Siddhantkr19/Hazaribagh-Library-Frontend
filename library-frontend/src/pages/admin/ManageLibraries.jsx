@@ -103,7 +103,7 @@ const ManageLibraries = () => {
                     {/* Image Banner */}
                     <div className="h-40 bg-gray-800 relative overflow-hidden">
                         {lib.images && lib.images.length > 0 ? (
-                            <img src={lib.images[0]} alt={lib.name} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105" />
+                            <img src={lib.images[0].imageUrl || lib.images[0].url} alt={lib.name} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105" />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-gray-600">No Image</div>
                         )}

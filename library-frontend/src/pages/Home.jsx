@@ -108,11 +108,13 @@ const Home = () => {
       
       {/* SECTION 1: HERO */}
       <div className="relative min-h-[90vh] flex flex-col justify-center overflow-hidden pb-10">
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 bg-gray-900 ">
           <img 
-            src="Background Image.jpg" 
-            alt="Hazaribagh Study Center" 
-            className="w-full h-full object-cover brightness-100"
+            src="Background Image.webp" 
+            alt="Hazaribagh Study Center" // ✅ FIX 2: Add 'loading="eager"' to force browser to prioritize this image
+             loading="eager"
+             fetchPriority="high"
+            className="w-full h-full object-cover brightness-100 transition-opacity duration-700 opacity-100 "
           />
           {/* Overlay Adjustment */}
           <div className="absolute inset-0 bg-black/50 dark:bg-black/60"></div>

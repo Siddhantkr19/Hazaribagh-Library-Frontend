@@ -44,7 +44,7 @@ const AllLibraries = () => {
         const formattedData = response.data.map(lib => ({
             id: lib.id,
             name: lib.name,
-            location: lib.locationTag || lib.address || "Hazaribagh", 
+            locationTag: lib.locationTag || lib.address || "Hazaribagh", 
             totalSeats: lib.totalSeats || 0,
            offerPrice: lib.offerPrice,
             originalPrice: lib.originalPrice,
@@ -55,6 +55,7 @@ const AllLibraries = () => {
             amenities: (lib.amenities && lib.amenities.length > 0) 
                 ? lib.amenities.map(item => getShortAmenityName(item)) 
                 : ["Wi-Fi", "AC"], 
+                images: lib.images || [],
 
             image: (lib.images && lib.images.length > 0) ? lib.images[0] : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop"
         }));
@@ -73,7 +74,7 @@ const AllLibraries = () => {
   // --- FILTERS LOGIC ---
   useEffect(() => {
     let result = libraries;
-    if (activeFilter === 'Matwari') result = result.filter(lib => lib.location.toLowerCase().includes('matwari'));
+    if (activeFilter === 'Matwari') result = result.filter(lib => lib.locationTag.toLowerCase().includes('matwari'));
     else if (activeFilter === 'Korrah') result = result.filter(lib => lib.location.toLowerCase().includes('korrah'));
     else if (activeFilter === 'Under 400') result = result.filter(lib => lib.offerPrice <= 400);
     else if (activeFilter === 'AC') result = result.filter(lib => lib.amenities.includes('AC')); 

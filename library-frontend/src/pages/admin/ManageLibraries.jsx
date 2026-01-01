@@ -128,7 +128,7 @@ const ManageLibraries = () => {
                             <div>
                                 <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Price</p>
                                 <p className="text-emerald-400 font-bold flex items-center gap-1 text-lg">
-                                    <IndianRupee size={16}/> {lib.offerPrice}
+                                    <IndianRupee size={16}/> {lib.originalPrice}
                                 </p>
                             </div>
                             <div>

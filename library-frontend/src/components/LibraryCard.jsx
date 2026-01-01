@@ -6,73 +6,63 @@ import { MdOutlineSecurity, MdMeetingRoom } from "react-icons/md";
 import { BiCctv } from "react-icons/bi";
 
 const LibraryCard = ({ library }) => {
-  // Destructure with safe defaults to prevent crash if amenities is null
+  // Destructure with safe defaults
   const { 
     id, 
     name, 
-    location, 
-    seats, 
-    price, 
-    oldPrice, 
-    image, 
-    amenities = [], // Default to empty array
+    locationTag,   // ✅ CORRECT: Matches DTO
+    totalSeats,    // ✅ CORRECT: Matches DTO
+    offerPrice,    // ✅ CORRECT: Matches DTO
+    originalPrice, // ✅ CORRECT: Matches DTO
+    images = [],   // ✅ CORRECT: Array of strings
+    amenities = [], 
     averageRating, 
     totalReviews 
   } = library;
 
   const navigate = useNavigate(); 
 
-  // 🛠️ HELPER: Cleans "Dirty" Java Data and returns Icon + Label
+  // ✅ HELPER: Optimize Cloudinary Image URL
+  const getOptimizedImageUrl = (url) => {
+    if (!url || !url.includes('cloudinary.com')) return url; 
+    return url.replace('/upload/', '/upload/w_400,h_300,c_fill,q_auto,f_auto/');
+  };
+
+  // ✅ HELPER: Cleans "Dirty" Java Data
   const getAmenityConfig = (amenityItem) => {
-    // 1. Get the name whether it's an object or a string
     let rawName = amenityItem.name || amenityItem;
-
-    // 2. ✨ MAGIC FIX: Detect if it's that ugly "LIBRARYAMENITY(ID=...)" string
     if (typeof rawName === 'string' && rawName.includes('NAME=')) {
-        // Extracts the text between "NAME=" and the next comma or closing parenthesis
         const match = rawName.match(/NAME=([^,)]+)/i);
-        if (match) {
-            rawName = match[1]; // Sets rawName to just "PARKING" (or whatever name)
-        }
+        if (match) rawName = match[1];
     }
-
-    // 3. Normalize to lowercase for keyword matching
     const lowerText = rawName ? rawName.toString().toLowerCase().trim() : '';
 
-    // 4. Return correct Icon and Label based on keywords
     if (lowerText.includes('wifi') || lowerText.includes('wi-fi')) 
         return { icon: <FaWifi />, label: 'WiFi', color: 'text-blue-500 dark:text-blue-400' };
-    
     if (lowerText.includes('non ac') || lowerText.includes('non-ac')) 
         return { icon: <TbAirConditioningDisabled />, label: 'Non AC', color: 'text-gray-500 dark:text-gray-400' };
-    
     if (lowerText.includes('ac') || lowerText.includes('air conditioning')) 
         return { icon: <TbAirConditioning />, label: 'AC', color: 'text-cyan-600 dark:text-cyan-300' };
-    
     if (lowerText.includes('water')) 
         return { icon: <FaGlassWater />, label: 'RO Water', color: 'text-blue-600 dark:text-blue-300' };
-    
     if (lowerText.includes('power') || lowerText.includes('backup')) 
         return { icon: <FaBolt />, label: 'Backup', color: 'text-yellow-600 dark:text-yellow-400' };
-    
     if (lowerText.includes('cctv')) 
         return { icon: <BiCctv />, label: 'CCTV', color: 'text-red-500 dark:text-red-300' };
-    
     if (lowerText.includes('security')) 
         return { icon: <MdOutlineSecurity />, label: 'Security', color: 'text-green-600 dark:text-green-300' };
-    
     if (lowerText.includes('discussion') || lowerText.includes('room')) 
         return { icon: <MdMeetingRoom />, label: 'Room', color: 'text-purple-600 dark:text-purple-300' };
-    
     if (lowerText.includes('parking')) 
         return { icon: <FaCar />, label: 'Parking', color: 'text-gray-500 dark:text-gray-300' };
 
-    // Fallback: Return the CLEANED name (rawName), not the ugly one
     return { icon: <FaChair />, label: rawName, color: 'text-gray-500 dark:text-gray-300' };
   };
 
-  // Helper for displaying rating
   const displayRating = (averageRating && averageRating > 0) ? Number(averageRating).toFixed(1) : "N/A";
+  
+  // ✅ Get the main image using the helper
+  const mainImage = images.length > 0 ? getOptimizedImageUrl(images[0]) : null;
 
   return (
     <div 
@@ -85,11 +75,19 @@ const LibraryCard = ({ library }) => {
         <div className="relative h-48 flex-shrink-0 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-0 dark:opacity-80 z-10" />
           
-          <img 
-            src={image} 
-            alt={name} 
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          />
+          {/* 🛠️ FIX 1: Use mainImage instead of 'image' */}
+          {mainImage ? (
+            <img 
+              src={mainImage} 
+              alt={name} 
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+          ) : (
+             // Fallback if no image exists
+            <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-800 text-gray-400">
+               No Image
+            </div>
+          )}
           
           {/* Seats Left Badge */}
           <div className="absolute top-3 left-3 z-20 bg-white/90 dark:bg-black/60 backdrop-blur-md border border-red-200 dark:border-red-500/30 px-3 py-1 rounded-full flex items-center gap-2 shadow-lg">
@@ -97,10 +95,10 @@ const LibraryCard = ({ library }) => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
             </span>
-            <span className="text-xs font-bold text-gray-800 dark:text-white tracking-wide">{seats} Left</span>
+            {/* 🛠️ FIX 2: Use totalSeats instead of 'seats' */}
+            <span className="text-xs font-bold text-gray-800 dark:text-white tracking-wide">{totalSeats} Left</span>
           </div>
 
-          {/* Rating Badge */}
           <div className="absolute top-3 right-3 z-20 bg-white/90 dark:bg-black/60 backdrop-blur-md border border-yellow-200 dark:border-yellow-500/30 px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-lg">
             <FaStar className="text-yellow-500 text-xs" />
             <span className="text-xs font-bold text-gray-800 dark:text-white">
@@ -111,7 +109,8 @@ const LibraryCard = ({ library }) => {
           <div className="absolute bottom-3 left-3 z-20">
             <div className="flex items-center gap-1 bg-blue-600/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-blue-400/30 shadow-lg">
               <span className="text-xs">📍</span>
-              <span className="text-xs font-bold text-white uppercase tracking-wide">{location}</span>
+              {/* 🛠️ FIX 3: Use locationTag instead of 'location' */}
+              <span className="text-xs font-bold text-white uppercase tracking-wide">{locationTag}</span>
             </div>
           </div>
         </div>
@@ -124,7 +123,6 @@ const LibraryCard = ({ library }) => {
               {name}
             </h3>
             
-            {/* Rating in Content Area */}
             <div className="flex items-center gap-1 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 px-2 py-1 rounded-lg">
               <span className="text-yellow-500 dark:text-yellow-400 text-xs">★</span>
               <span className="text-xs font-bold text-gray-700 dark:text-gray-200">
@@ -139,7 +137,6 @@ const LibraryCard = ({ library }) => {
           {/* Amenities List */}
           <div className="flex flex-wrap gap-2 mb-5">
             {amenities.slice(0, 3).map((item, index) => {
-               // We pass the raw item, and getAmenityConfig cleans it!
                const config = getAmenityConfig(item);
                return (
                 <span key={index} className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
@@ -159,10 +156,12 @@ const LibraryCard = ({ library }) => {
 
             <div className="flex justify-between items-center">
               <div className="flex flex-col">
-                <span className="text-xs text-gray-400 dark:text-gray-500 line-through">₹{oldPrice}</span>
+                {/* 🛠️ FIX 4: Use originalPrice instead of 'oldPrice' */}
+                <span className="text-xs text-gray-400 dark:text-gray-500 line-through">₹{originalPrice}</span>
                 <div className="flex items-baseline gap-1">
                   <span className="text-xl font-black text-gray-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-blue-400 dark:to-cyan-300">
-                    ₹{price}
+                    {/* 🛠️ FIX 5: Use offerPrice instead of 'price' */}
+                    ₹{offerPrice}
                   </span>
                   <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">/mo</span>
                 </div>

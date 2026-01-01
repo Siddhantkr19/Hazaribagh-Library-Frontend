@@ -241,7 +241,7 @@ const formattedImages = formData.images.map(imgUrl => ({ imageUrl: imgUrl }));
                     <input 
                         type="file" 
                         id="imgUpload" 
-                        accept="image/png, image/jpeg, image/jpg" 
+                        accept="image/png, image/jpeg, image/jpg , image/webp" 
                         onChange={handleFileUpload} 
                         className="hidden" 
                         disabled={uploading}

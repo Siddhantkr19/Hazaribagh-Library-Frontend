@@ -6,15 +6,14 @@ import { MdOutlineSecurity, MdMeetingRoom } from "react-icons/md";
 import { BiCctv } from "react-icons/bi";
 
 const LibraryCard = ({ library }) => {
-  // Destructure with safe defaults
   const { 
     id, 
     name, 
-    locationTag,   // ✅ CORRECT: Matches DTO
-    totalSeats,    // ✅ CORRECT: Matches DTO
-    offerPrice,    // ✅ CORRECT: Matches DTO
-    originalPrice, // ✅ CORRECT: Matches DTO
-    images = [],   // ✅ CORRECT: Array of strings
+    locationTag,   
+    totalSeats,    
+    offerPrice,    
+    originalPrice, 
+    images = [],   
     amenities = [], 
     averageRating, 
     totalReviews 
@@ -22,10 +21,16 @@ const LibraryCard = ({ library }) => {
 
   const navigate = useNavigate(); 
 
-  // ✅ HELPER: Optimize Cloudinary Image URL
-  const getOptimizedImageUrl = (url) => {
-    if (!url || !url.includes('cloudinary.com')) return url; 
-    return url.replace('/upload/', '/upload/w_400,h_300,c_fill,q_auto,f_auto/');
+  // ✅ HELPER: Optimize Cloudinary Image URL (Fixes Blurriness)
+  const getOptimizedImageUrl = (url, width = 400, height = 300) => {
+    if (!url || !url.includes('cloudinary.com')) {
+      return url; 
+    }
+    // f_auto: Best format (WebP/AVIF)
+    // q_auto: Best quality
+    // c_fill: Crop to fit exact dimensions
+    const transformation = `f_auto,q_auto,c_fill,w_${width},h_${height}`;
+    return url.replace('/upload/', `/upload/${transformation}/`);
   };
 
   // ✅ HELPER: Cleans "Dirty" Java Data
@@ -61,7 +66,7 @@ const LibraryCard = ({ library }) => {
 
   const displayRating = (averageRating && averageRating > 0) ? Number(averageRating).toFixed(1) : "N/A";
   
-  // ✅ Get the main image using the helper
+  // ✅ GET MAIN IMAGE (Applied Optimization Here)
   const mainImage = images.length > 0 ? getOptimizedImageUrl(images[0]) : null;
 
   return (
@@ -75,15 +80,14 @@ const LibraryCard = ({ library }) => {
         <div className="relative h-48 flex-shrink-0 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-0 dark:opacity-80 z-10" />
           
-          {/* 🛠️ FIX 1: Use mainImage instead of 'image' */}
           {mainImage ? (
             <img 
               src={mainImage} 
               alt={name} 
+              loading="lazy"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
           ) : (
-             // Fallback if no image exists
             <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-800 text-gray-400">
                No Image
             </div>
@@ -95,7 +99,6 @@ const LibraryCard = ({ library }) => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
             </span>
-            {/* 🛠️ FIX 2: Use totalSeats instead of 'seats' */}
             <span className="text-xs font-bold text-gray-800 dark:text-white tracking-wide">{totalSeats} Left</span>
           </div>
 
@@ -109,7 +112,6 @@ const LibraryCard = ({ library }) => {
           <div className="absolute bottom-3 left-3 z-20">
             <div className="flex items-center gap-1 bg-blue-600/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-blue-400/30 shadow-lg">
               <span className="text-xs">📍</span>
-              {/* 🛠️ FIX 3: Use locationTag instead of 'location' */}
               <span className="text-xs font-bold text-white uppercase tracking-wide">{locationTag}</span>
             </div>
           </div>
@@ -156,14 +158,12 @@ const LibraryCard = ({ library }) => {
 
             <div className="flex justify-between items-center">
               <div className="flex flex-col">
-                {/* 🛠️ FIX 4: Use originalPrice instead of 'oldPrice' */}
                 <span className="text-xs text-gray-400 dark:text-gray-500 line-through">₹{originalPrice}</span>
                 <div className="flex items-baseline gap-1">
                   <span className="text-xl font-black text-gray-900 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-blue-400 dark:to-cyan-300">
-                    {/* 🛠️ FIX 5: Use offerPrice instead of 'price' */}
                     ₹{offerPrice}
                   </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">/no</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">/mo</span>
                 </div>
               </div>
               

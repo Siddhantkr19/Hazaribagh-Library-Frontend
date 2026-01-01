@@ -64,14 +64,19 @@ const Home = () => {
         id: lib.id,
         name: lib.name,
         location: lib.locationTag || lib.address || "Hazaribagh", 
-        seats: lib.totalSeats || 0,
-        price: lib.offerPrice,
-        oldPrice: lib.originalPrice,
-        rating: 4.5, 
+       // FIX 1: Keep the variable names consistent with Backend/DTO
+        offerPrice: lib.offerPrice,      // Was 'price'
+        originalPrice: lib.originalPrice, // Was 'oldPrice'
+        totalSeats: lib.totalSeats || 0,  // Was 'seats'
+        
+        rating: lib.averageRating || 4.5, // Use backend rating if available
         amenities: lib.amenities || ["WiFi", "AC"], 
+        
+        // FIX 2: Pass the whole array AND the single image helper
+        images: lib.images || [],
         image: (lib.images && lib.images.length > 0) 
-               ? lib.images[0] 
-               : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop"
+                ? lib.images[0] 
+                : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop"
     }));
   };
   

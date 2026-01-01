@@ -163,7 +163,7 @@ const LibraryCard = ({ library }) => {
                     {/* 🛠️ FIX 5: Use offerPrice instead of 'price' */}
                     ₹{offerPrice}
                   </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">/mo</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">/no</span>
                 </div>
               </div>
               

@@ -45,9 +45,9 @@ const AllLibraries = () => {
             id: lib.id,
             name: lib.name,
             location: lib.locationTag || lib.address || "Hazaribagh", 
-            seats: lib.totalSeats || 0,
-            price: lib.offerPrice,
-            oldPrice: lib.originalPrice,
+            totalSeats: lib.totalSeats || 0,
+           offerPrice: lib.offerPrice,
+            originalPrice: lib.originalPrice,
             averageRating: lib.averageRating || 0, 
             totalReviews: lib.totalReviews || 0,
             
@@ -75,7 +75,7 @@ const AllLibraries = () => {
     let result = libraries;
     if (activeFilter === 'Matwari') result = result.filter(lib => lib.location.toLowerCase().includes('matwari'));
     else if (activeFilter === 'Korrah') result = result.filter(lib => lib.location.toLowerCase().includes('korrah'));
-    else if (activeFilter === 'Under 400') result = result.filter(lib => lib.price <= 400);
+    else if (activeFilter === 'Under 400') result = result.filter(lib => lib.offerPrice <= 400);
     else if (activeFilter === 'AC') result = result.filter(lib => lib.amenities.includes('AC')); 
 
     if (searchQuery) {

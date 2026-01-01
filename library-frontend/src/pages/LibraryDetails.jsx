@@ -34,7 +34,7 @@ const LibraryDetails = () => {
   if (!library) return null;
 
   const mainImage = (library.images && library.images.length > 0) 
-    ? (library.images[0].imageUrl || library.images[0].url)
+   ? library.images[0]
     : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop";
 
   const ratingValue = library.averageRating || library.average_rating || 0;
@@ -86,7 +86,7 @@ const LibraryDetails = () => {
                 {library.images && library.images.length > 1 && (
                     <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                         {library.images.slice(1).map((img, idx) => (
-                            <img key={idx} src={img.url} alt="Gallery" className="w-24 h-24 rounded-xl object-cover border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-80 transition-opacity shadow-sm" />
+                            <img key={idx} src={img} alt="Gallery" className="w-24 h-24 rounded-xl object-cover border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-80 transition-opacity shadow-sm" />
                         ))}
                     </div>
                 )}

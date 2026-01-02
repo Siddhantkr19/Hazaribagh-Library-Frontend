@@ -80,7 +80,7 @@ const Login = () => {
       
       {/* BACKGROUND IMAGE - Only visible in Dark Mode or reduced opacity in Light Mode */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <img src="/Background Image.jpg" alt="Library Background" className="w-full h-full object-cover opacity-10 dark:opacity-40 transition-opacity duration-300" />
+        <img src="/Background Image.webp" alt="Library Background" className="w-full h-full object-cover opacity-60 dark:opacity-60 transition-opacity duration-900" />
         <div className="absolute inset-0 bg-white/30 dark:bg-black/60 backdrop-blur-[2px]"></div>
       </div>
       

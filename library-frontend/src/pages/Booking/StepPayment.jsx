@@ -29,7 +29,7 @@ const StepPayment = () => {
       const orderData = await createOrderAPI(user.email, library.id);
       
       const options = {
-        key: "rzp_test_RsHxpfN8FVqy1g", // Replace with your key
+        key: "rzp_live_RzPFjSSMCXY7aV", // Replace with your key
         amount: orderData.amountPaid * 100,
         currency: "INR",
         name: "LibHub",

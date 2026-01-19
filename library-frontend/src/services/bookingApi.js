@@ -1,43 +1,34 @@
-import axios from 'axios';
-
-// Base Axios Instance
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, 
-  headers: { 'Content-Type': 'application/json' },
-  withCredentials: true
-});
+import api from './api'; // ✅ IMPORT SHARED INSTANCE
 
 // --- BOOKING ENDPOINTS ---
 export const createOrderAPI = async (userEmail, libraryId) => {
+  // api.post returns the wrapper { success: true, data: ... }
+  // So 'response' IS the wrapper. 'response.data' is the actual Booking object.
   const response = await api.post(`/bookings/create-order?userEmail=${userEmail}`, {
     libraryId: libraryId
   });
-  return response.data;
+  return response.data; // Return the Booking Object
 };
 
 export const verifyPaymentAPI = async (verificationData) => {
   const response = await api.post('/bookings/verify-payment', verificationData);
-  return response.data;
+  return response.data; // Return the confirmed Booking
 };
 
-// --- NEW: FETCH LIBRARY DETAILS ---
+// --- FETCH LIBRARY DETAILS ---
 export const getLibraryById = async (id) => {
-  // Assuming your backend has this endpoint. If not, use the logic from AllLibraries to findByID
   const response = await api.get(`/libraries/${id}`); 
-  // If your backend only has /libraries, you might need to fetch all and find one, but getting by ID is better.
-  return response.data;
+  return response.data; // Return the Library Object
 };
 
-// --- NEW: CHECK IF USER EXISTS ---
+// --- CHECK IF USER EXISTS ---
 export const checkUserByEmail = async (email) => {
-  // You need to create this endpoint in your AuthController on Backend
-  // Example: @GetMapping("/check-email") public boolean checkEmail(@RequestParam String email) ...
   try {
     const response = await api.get(`/auth/check-email?email=${email}`);
-    return response.data; // Should return { exists: true/false } or just boolean
+    return response.data; // Returns true/false
   } catch (error) {
     console.error("Check email failed", error);
-    return false; // Assume false or handle error
+    return false;
   }
 };
 

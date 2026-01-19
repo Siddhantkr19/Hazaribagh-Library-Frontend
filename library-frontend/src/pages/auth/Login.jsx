@@ -45,8 +45,8 @@ const Login = () => {
           password: password 
       });
       
-      if (response.data) {
-        setSuccessMessage("Login Successful! Redirecting...");
+      if (response.success) {
+        setSuccessMessage(response.message || "Login Successful! Redirecting...");
         login(response.data); 
       
         setTimeout(() => {
@@ -61,11 +61,10 @@ const Login = () => {
 
     } catch (err) {
       console.error("Login Error:", err);
-      if (err.response && err.response.status === 403) {
+      // ✅ SIMPLIFIED: 'err' is now just the string message from backend!
+      // No need to check err.response.status anymore
           setError("Invalid password or email.");
-      } else {
-          setError("Login failed. Please try again.");
-      }
+      setError(err); 
       setLoading(false);
     }
   };

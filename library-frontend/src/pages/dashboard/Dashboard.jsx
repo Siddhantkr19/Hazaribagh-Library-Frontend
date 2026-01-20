@@ -6,6 +6,7 @@ import profilePictureService from '../../services/profilePicture';
 import adminApi from '../../services/adminApi'; 
 // ✅ ADDED Icons for notifications
 import { CheckCircle, XCircle } from 'lucide-react'; 
+import { useQuery } from '@tanstack/react-query';
 
 // Import Sub-Components
 import ActiveSubscriptions from './ActiveSubscriptions';
@@ -19,8 +20,8 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   
-  const [activeBookings, setActiveBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [activeBookings, setActiveBookings] = useState([]);
+  // const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null);
 
@@ -39,21 +40,19 @@ const Dashboard = () => {
     }
   }, [user, navigate]);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      if (!user?.email) return;
-      try {
-        const response = await bookingApi.get(`/bookings/dashboard?userEmail=${user.email}`);
-        setActiveBookings(response.data);
-      } catch (err) {
-        console.error("Failed to fetch dashboard data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDashboardData();
-  }, [user]);
 
+// ✅ REPLACED: UseQuery to fetch dashboard data
+  const { data: activeBookings = [], isLoading: loading } = useQuery({
+    queryKey: ['dashboard', user?.email], // Unique cache key based on user email
+    queryFn: async () => {
+        const response = await bookingApi.get(`/bookings/dashboard?userEmail=${user.email}`);
+        return response.data; // Return the data directly
+    },
+    enabled: !!user?.email, // Only fetch if user exists
+    staleTime: 1000 * 60 * 5, // Cache for 5 mins
+  });
+
+  
   // ✅ NEW: Helper function to show notifications
   const showNotification = (type, message) => {
     setNotification({ type, message });

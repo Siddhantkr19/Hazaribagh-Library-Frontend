@@ -1,27 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import api from '../services/api';
 import LibraryCard from '../components/LibraryCard';
+import { useQuery } from '@tanstack/react-query'; // ✅ Import useQuery
 
 const AllLibraries = () => {
-  const [libraries, setLibraries] = useState([]);       
-  const [filteredData, setFilteredData] = useState([]); 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // ✅ Removed 'libraries', 'loading', 'error' states (handled by React Query)
   const [searchQuery, setSearchQuery] = useState('');   
   const [activeFilter, setActiveFilter] = useState('All'); 
 
-  // 🛠️ HELPER: Converts "Air Conditioning" -> "AC" and cleans Java Strings
+  // 🛠️ HELPER: Converts "Air Conditioning" -> "AC"
   const getShortAmenityName = (backendItem) => {
-      // 1. Get the raw string (Handle if it's an object or string)
       let name = backendItem.name || backendItem; 
-
-      // 2. Fix the "LIBRARYAMENITY(ID=5, NAME=WI-FI)" issue
       if (typeof name === 'string' && name.includes('NAME=')) {
-          const match = name.match(/NAME=([^,)]+)/); // Regex to grab text after NAME=
+          const match = name.match(/NAME=([^,)]+)/);
           if (match) name = match[1];
       }
-
-      // 3. Map to Short Names (Standardize)
       const lowerName = name.toString().toLowerCase().trim();
       
       if (lowerName.includes('wi-fi') || lowerName.includes('wifi')) return 'Wi-Fi';
@@ -33,58 +26,53 @@ const AllLibraries = () => {
       if (lowerName.includes('parking')) return 'Parking';
       if (lowerName.includes('discussion')) return 'Room';
 
-      return name; // Return original if no match found (e.g., "New Feature")
+      return name; 
   };
 
-  useEffect(() => {
-    const fetchLibraries = async () => {
-      try {
-        const response = await api.get('/libraries');
-        
-        const formattedData = response.data.map(lib => ({
-            id: lib.id,
-            name: lib.name,
-            locationTag: lib.locationTag || lib.address || "Hazaribagh", 
-            totalSeats: lib.totalSeats || 0,
-           offerPrice: lib.offerPrice,
-            originalPrice: lib.originalPrice,
-            averageRating: lib.averageRating || 0, 
-            totalReviews: lib.totalReviews || 0,
-            
-            // ✅ CLEAN THE AMENITIES HERE BEFORE SENDING TO CARD
-            amenities: (lib.amenities && lib.amenities.length > 0) 
-                ? lib.amenities.map(item => getShortAmenityName(item)) 
-                : ["Wi-Fi", "AC"], 
-                images: lib.images || [],
+  // ✅ 1. THE FETCHER FUNCTION
+  const fetchLibraries = async () => {
+    const response = await api.get('/libraries');
+    // We process the data right here before returning it
+    return response.map(lib => ({
+        id: lib.id,
+        name: lib.name,
+        locationTag: lib.locationTag || lib.address || "Hazaribagh", 
+        totalSeats: lib.totalSeats || 0,
+        offerPrice: lib.offerPrice,
+        originalPrice: lib.originalPrice,
+        averageRating: lib.averageRating || 0, 
+        totalReviews: lib.totalReviews || 0,
+        amenities: (lib.amenities && lib.amenities.length > 0) 
+            ? lib.amenities.map(item => getShortAmenityName(item)) 
+            : ["Wi-Fi", "AC"], 
+        images: lib.images || [],
+        image: (lib.images && lib.images.length > 0) ? lib.images[0] : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop"
+    }));
+  };
 
-            image: (lib.images && lib.images.length > 0) ? lib.images[0] : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop"
-        }));
-        setLibraries(formattedData);
-        setFilteredData(formattedData); 
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching libraries:", err);
-        setError("Failed to load libraries.");
-        setLoading(false);
-      }
-    };
-    fetchLibraries();
-  }, []);
+  // ✅ 2. USE QUERY HOOK
+  // This automatically handles caching, loading, and errors
+  const { data: libraries = [], isLoading, isError } = useQuery({
+    queryKey: ['libraries'], // The unique ID for this data in the cache
+    queryFn: fetchLibraries, // The function to run
+  });
 
-  // --- FILTERS LOGIC ---
-  useEffect(() => {
+  // ✅ 3. OPTIMIZED FILTERING (Replaces the old useEffect)
+  // useMemo only recalculates when dependencies change
+  const filteredData = useMemo(() => {
     let result = libraries;
+    
     if (activeFilter === 'Matwari') result = result.filter(lib => lib.locationTag.toLowerCase().includes('matwari'));
-    else if (activeFilter === 'Korrah') result = result.filter(lib => lib.location.toLowerCase().includes('korrah'));
+    else if (activeFilter === 'Korrah') result = result.filter(lib => lib.locationTag.toLowerCase().includes('korrah')); // Fixed 'location' -> 'locationTag'
     else if (activeFilter === 'Under 400') result = result.filter(lib => lib.offerPrice <= 400);
     else if (activeFilter === 'AC') result = result.filter(lib => lib.amenities.includes('AC')); 
 
     if (searchQuery) {
         const lowerQuery = searchQuery.toLowerCase();
-        result = result.filter(lib => lib.name.toLowerCase().includes(lowerQuery) || lib.location.toLowerCase().includes(lowerQuery));
+        result = result.filter(lib => lib.name.toLowerCase().includes(lowerQuery) || lib.locationTag.toLowerCase().includes(lowerQuery));
     }
-    setFilteredData(result);
-  }, [searchQuery, activeFilter, libraries]);
+    return result;
+  }, [libraries, searchQuery, activeFilter]);
 
   const FilterButton = ({ label, value }) => (
     <button 

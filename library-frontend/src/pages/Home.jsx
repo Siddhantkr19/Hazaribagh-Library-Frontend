@@ -80,11 +80,32 @@ const Home = () => {
     }));
   };
   
-  useEffect(() => {
+useEffect(() => {
     const fetchTrendingLibraries = async () => {
       try {
         const response = await api.get('/libraries');
-        const formattedData = mapBackendDataToFrontend(response.data);
+        
+        // 🛡️ SAFETY CHECK: Handle Wrapper vs Array vs HTML garbage
+        let dataArray = [];
+        
+        // 1. If response is the Wrapper Object { success: true, data: [...] }
+        if (response && Array.isArray(response.data)) {
+             dataArray = response.data;
+        } 
+        // 2. If response is just the Array [...]
+        else if (Array.isArray(response)) {
+             dataArray = response;
+        }
+        
+        // 3. If dataArray is still empty, it means we got HTML/Garbage. STOP here.
+        if (dataArray.length === 0) {
+            console.warn("⚠️ Backend sending non-array data (likely waking up). Skipping trending.");
+            setTrendingLibraries([]);
+            setLoading(false);
+            return;
+        }
+
+        const formattedData = mapBackendDataToFrontend(dataArray);
         setTrendingLibraries(formattedData.slice(0, 5)); 
         setLoading(false);
       } catch (error) {
@@ -94,7 +115,6 @@ const Home = () => {
     };
     fetchTrendingLibraries();
   }, []);
-
   const handleSearchResults = (data) => {
     const formattedData = mapBackendDataToFrontend(data);
     setSearchResults(formattedData);

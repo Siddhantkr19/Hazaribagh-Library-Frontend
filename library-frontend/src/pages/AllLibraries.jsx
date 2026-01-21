@@ -29,32 +29,58 @@ const AllLibraries = () => {
       return name; 
   };
 
-  // ✅ 1. THE FETCHER FUNCTION
+ // ✅ 1. THE FIXED FETCHER FUNCTION
   const fetchLibraries = async () => {
-    const response = await api.get('/libraries');
-    // We process the data right here before returning it
-    return response.map(lib => ({
-        id: lib.id,
-        name: lib.name,
-        locationTag: lib.locationTag || lib.address || "Hazaribagh", 
-        totalSeats: lib.totalSeats || 0,
-        offerPrice: lib.offerPrice,
-        originalPrice: lib.originalPrice,
-        averageRating: lib.averageRating || 0, 
-        totalReviews: lib.totalReviews || 0,
-        amenities: (lib.amenities && lib.amenities.length > 0) 
-            ? lib.amenities.map(item => getShortAmenityName(item)) 
-            : ["Wi-Fi", "AC"], 
-        images: lib.images || [],
-        image: (lib.images && lib.images.length > 0) ? lib.images[0] : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop"
-    }));
+    try {
+        const response = await api.get('/libraries');
+        
+        // 🔍 DEBUG: See exactly what we got
+        console.log("API Response:", response); 
+
+        // ✅ HANDLE BOTH CASES:
+        // Case A: Interceptor returned the wrapper { data: [...] }
+        // Case B: Interceptor returned just the array (if you change logic later)
+        let libraryList = [];
+        
+        if (Array.isArray(response)) {
+            libraryList = response;
+        } else if (response && Array.isArray(response.data)) {
+            libraryList = response.data; // <--- This extracts the list from the wrapper
+        } else {
+            console.error("Unexpected data structure:", response);
+            return [];
+        }
+
+        return libraryList.map(lib => ({
+            id: lib.id,
+            name: lib.name,
+            locationTag: lib.locationTag || lib.address || "Hazaribagh", 
+            totalSeats: lib.totalSeats || 0,
+            offerPrice: lib.offerPrice,
+            originalPrice: lib.originalPrice,
+            averageRating: lib.averageRating || 0, 
+            totalReviews: lib.totalReviews || 0,
+            amenities: (lib.amenities && lib.amenities.length > 0) 
+                ? lib.amenities.map(item => getShortAmenityName(item)) 
+                : ["Wi-Fi", "AC"], 
+            images: lib.images || [],
+            image: (lib.images && lib.images.length > 0) ? lib.images[0] : "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2670&auto=format&fit=crop"
+        }));
+    } catch (err) {
+        console.error("Fetch failed:", err);
+        throw err;
+    }
   };
 
-  // ✅ 2. USE QUERY HOOK
-  // This automatically handles caching, loading, and errors
-  const { data: libraries = [], isLoading, isError } = useQuery({
-    queryKey: ['libraries'], // The unique ID for this data in the cache
-    queryFn: fetchLibraries, // The function to run
+// ✅ 2. USE QUERY HOOK
+  // Fix: Rename 'isLoading' to 'loading' and extract 'error' so your JSX works
+  const { 
+    data: libraries = [], 
+    isLoading: loading,   // <--- Rename here
+    error                 // <--- Extract error here
+  } = useQuery({
+    queryKey: ['libraries'], 
+    queryFn: fetchLibraries, 
   });
 
   // ✅ 3. OPTIMIZED FILTERING (Replaces the old useEffect)

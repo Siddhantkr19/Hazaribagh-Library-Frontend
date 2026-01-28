@@ -103,34 +103,34 @@ const Dashboard = () => {
   const triggerFileInput = () => {
     fileInputRef.current.click();
   };
+// src/pages/dashboard/Dashboard.jsx
 
   const handleHelpSubmit = async (e) => {
     e.preventDefault();
     if (!helpMessage.trim()) return;
 
     setIsSendingHelp(true);
-    try {
-        // Use adminApi to automatically handle cookies/credentials
-        await adminApi.post('/help/submit', {
+    try { 
+        // ✅ CORRECT FIX: Call the service function
+        await adminApi.submitHelpTicket({
             userEmail: user.email,
             subject: helpSubject,
             message: helpMessage, 
             bookingId: activeBookings.length > 0 ? activeBookings[0].bookingId : null 
         });
 
-        // ✅ REPLACED ALERT WITH NOTIFICATION
         showNotification('success', "Ticket submitted successfully! Admin will review your request.");
         
         setShowHelpModal(false);
         setHelpMessage("");
     } catch (error) {
         console.error("Help submit error", error);
-        // ✅ REPLACED ALERT WITH NOTIFICATION
         showNotification('error', "Failed to send request. Please try again.");
     } finally {
         setIsSendingHelp(false);
     }
   };
+  
 
   if (!user) return null;
 

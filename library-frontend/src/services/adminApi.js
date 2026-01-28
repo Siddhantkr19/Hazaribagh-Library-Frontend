@@ -44,6 +44,15 @@ export const cancelBooking = async (bookingId) => {
   return response.message;
 };
 
+// --- DASHBOARD STAT
+
+// ✅ ADD THIS NEW FUNCTION
+export const submitHelpTicket = async (helpData) => {
+  // api.post IS a function because 'api' is the axios instance
+  const response = await api.post('/help/submit', helpData);
+  return response.data;
+};
+
 // --- DOWNLOAD REPORT (SPECIAL CASE) ---
 // PDF downloads are binary, so we need specific config
 export const downloadPaymentReport = async (filters) => {
@@ -63,7 +72,9 @@ const adminApi = {
   getAllStudents,
   createOfflineBooking,
   cancelBooking,
-  downloadPaymentReport
+  downloadPaymentReport,
+  submitHelpTicket
+  
 };
 
 export default adminApi;

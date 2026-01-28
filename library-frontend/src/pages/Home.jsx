@@ -4,11 +4,12 @@ import LibraryCard from '../components/LibraryCard';
 import WelcomeOffer from '../components/WelcomeOffer';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-
+import { useQuery } from '@tanstack/react-query'; // ✅ 1. Import React Query
+import Loading from '../components/Loading';
 const Home = () => {
-  const [trendingLibraries, setTrendingLibraries] = useState([]);
+  
   const [searchResults, setSearchResults] = useState(null); 
-  const [loading, setLoading] = useState(true);
+ 
   
   const resultsRef = useRef(null);
 
@@ -80,41 +81,28 @@ const Home = () => {
     }));
   };
   
-useEffect(() => {
-    const fetchTrendingLibraries = async () => {
-      try {
+// ✅ 3. REPLACE USE_EFFECT WITH USE_QUERY
+  const { data: trendingLibraries = [], isLoading: loading } = useQuery({
+    queryKey: ['libraries'], // 🔑 SAME KEY as AllLibraries.jsx for shared caching!
+    queryFn: async () => {
         const response = await api.get('/libraries');
         
-        // 🛡️ SAFETY CHECK: Handle Wrapper vs Array vs HTML garbage
         let dataArray = [];
-        
-        // 1. If response is the Wrapper Object { success: true, data: [...] }
         if (response && Array.isArray(response.data)) {
              dataArray = response.data;
-        } 
-        // 2. If response is just the Array [...]
-        else if (Array.isArray(response)) {
+        } else if (Array.isArray(response)) {
              dataArray = response;
         }
         
-        // 3. If dataArray is still empty, it means we got HTML/Garbage. STOP here.
-        if (dataArray.length === 0) {
-            console.warn("⚠️ Backend sending non-array data (likely waking up). Skipping trending.");
-            setTrendingLibraries([]);
-            setLoading(false);
-            return;
-        }
+        if (dataArray.length === 0) return [];
 
         const formattedData = mapBackendDataToFrontend(dataArray);
-        setTrendingLibraries(formattedData.slice(0, 5)); 
-        setLoading(false);
-      } catch (error) {
-        console.error("Failed to fetch trending libraries", error);
-        setLoading(false);
-      }
-    };
-    fetchTrendingLibraries();
-  }, []);
+        // We only show the top 5 trending
+        return formattedData.slice(0, 5);
+    },
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+  
   const handleSearchResults = (data) => {
     const formattedData = mapBackendDataToFrontend(data);
     setSearchResults(formattedData);
@@ -128,6 +116,9 @@ useEffect(() => {
     setSearchResults(null);
   };
 
+  if (loading) {
+    return <Loading message="Loading trending libraries..." />;
+  }
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       

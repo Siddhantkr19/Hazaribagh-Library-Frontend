@@ -2,11 +2,12 @@ import React, { useState, useMemo } from 'react';
 import api from '../services/api';
 import LibraryCard from '../components/LibraryCard';
 import { useQuery } from '@tanstack/react-query'; // ✅ Import useQuery
-
+import Loading from '../components/Loading'; //
 const AllLibraries = () => {
   // ✅ Removed 'libraries', 'loading', 'error' states (handled by React Query)
   const [searchQuery, setSearchQuery] = useState('');   
   const [activeFilter, setActiveFilter] = useState('All'); 
+//   const [loading, setLoading] = useState(true); // or const { isLoading } = useQuery(...)
 
   // 🛠️ HELPER: Converts "Air Conditioning" -> "AC"
   const getShortAmenityName = (backendItem) => {
@@ -113,6 +114,10 @@ const AllLibraries = () => {
     </button>
   );
 
+  if (loading) {
+    return <Loading message="Finding best libraries..." />;
+  }
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 font-sans">
       <div className="relative z-10 pt-28 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -153,14 +158,7 @@ const AllLibraries = () => {
                 <FilterButton label="❄️ AC" value="AC" />
             </div>
         </div>
-
-        {/* Results */}
-        {loading && (
-             <div className="text-center py-20">
-                 <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                 <p className="text-gray-600 dark:text-gray-400">Loading libraries...</p>
-             </div>
-        )}
+       
         
         {error && <div className="text-center text-red-500 dark:text-red-400 py-10">{error}</div>}
 

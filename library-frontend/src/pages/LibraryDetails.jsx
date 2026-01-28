@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { Star, MessageSquare, MapPin, Clock, CheckCircle, Wifi, Zap, Droplets, Lock, ShieldCheck, Car } from 'lucide-react';
-
+import Loading from '../components/Loading';
 const LibraryDetails = () => {
   const { id } = useParams(); 
   const navigate = useNavigate(); 
@@ -29,7 +29,10 @@ const LibraryDetails = () => {
     fetchLibraryDetails();
   }, [id]);
 
-  if (loading) return <div className="min-h-screen pt-24 flex items-center justify-center text-gray-600 dark:text-white">Loading details...</div>;
+  if (loading) {
+    return <Loading message="Loading library details..." />;
+  }
+
   if (error) return <div className="min-h-screen pt-24 flex items-center justify-center text-red-500">{error}</div>;
   if (!library) return null;
 

@@ -33,6 +33,7 @@ const Dashboard = () => {
 
   // ✅ NEW: Notification State
   const [notification, setNotification] = useState(null);
+  
 
   useEffect(() => {
     if (!user) {
@@ -130,7 +131,7 @@ const Dashboard = () => {
         setIsSendingHelp(false);
     }
   };
-  
+
 
   if (!user) return null;
 

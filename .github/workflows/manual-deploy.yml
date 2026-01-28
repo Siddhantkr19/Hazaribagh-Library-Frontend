@@ -1,6 +1,4 @@
 name: Manual Production Deploy
-
-# 🛑 This ensures it ONLY runs when you click the button
 on: 
   workflow_dispatch:
 

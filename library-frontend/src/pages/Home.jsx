@@ -5,7 +5,6 @@ import WelcomeOffer from '../components/WelcomeOffer';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { useQuery } from '@tanstack/react-query'; // ✅ 1. Import React Query
-import Loading from '../components/Loading';
 const Home = () => {
   
   const [searchResults, setSearchResults] = useState(null); 
@@ -116,9 +115,7 @@ const Home = () => {
     setSearchResults(null);
   };
 
-  if (loading) {
-    return <Loading message="Loading trending libraries..." />;
-  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       

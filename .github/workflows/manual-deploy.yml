@@ -1,0 +1,39 @@
+name: Manual Production Deploy
+
+# 🛑 This ensures it ONLY runs when you click the button
+on: 
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Get the latest code from GitHub
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js (Matches your local environment)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3. Install Dependencies
+      - name: Install Dependencies
+        run: npm ci
+
+      # 4. Build the Project (Safety Check)
+      # If this fails, the deploy stops immediately.
+      - name: Build Project
+        run: npm run build
+
+      # 5. Deploy to Vercel (Only if Build passes)
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod' # 🚀 This pushes directly to Production

@@ -16,21 +16,25 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          # Points to the correct lock file location
+          # Points to the lock file inside your subfolder
           cache-dependency-path: library-frontend/package-lock.json
 
-      # 1. Install Dependencies (Runs inside the subfolder)
+      # 1. Install Dependencies
+      # We go into the folder because that is where package.json is
       - name: Install Dependencies
         working-directory: ./library-frontend
         run: npm ci
 
-      # 2. Build Project (Runs inside the subfolder)
+      # 2. Build Project
+      # We go into the folder because that is where the build script is
       - name: Build Project
         working-directory: ./library-frontend
         run: npm run build
 
       # 3. Deploy to Vercel
-      # We removed 'defaults', so './library-frontend' is now the correct path from Root
+      # 🛑 CRITICAL FIX: We do NOT use working-directory here.
+      # We run this from the Root. Vercel's dashboard settings will automatically
+      # find the 'library-frontend' folder.
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
@@ -39,4 +43,3 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
           vercel-version: 'latest' # Forces the new Vercel CLI
-          working-directory: ./library-frontend

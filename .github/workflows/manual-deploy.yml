@@ -7,8 +7,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # 👇 THIS IS THE MAGIC FIX
-    # It tells every command to run inside your subfolder
+    # This ensures npm commands run inside the subfolder
     defaults:
       run:
         working-directory: ./library-frontend
@@ -22,7 +21,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          # 👇 This helps caching find the right lock file
+          # Points to the correct lock file location
           cache-dependency-path: library-frontend/package-lock.json
 
       - name: Install Dependencies
@@ -38,5 +37,5 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
-          # 👇 Important: Tell Vercel CLI to look inside the folder too
+          vercel-version: 'latest' # 👈 Crucial Fix
           working-directory: ./library-frontend

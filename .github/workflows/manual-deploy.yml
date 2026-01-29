@@ -7,11 +7,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # This ensures npm commands run inside the subfolder
-    defaults:
-      run:
-        working-directory: ./library-frontend
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -24,12 +19,18 @@ jobs:
           # Points to the correct lock file location
           cache-dependency-path: library-frontend/package-lock.json
 
+      # 1. Install Dependencies (Runs inside the subfolder)
       - name: Install Dependencies
+        working-directory: ./library-frontend
         run: npm ci
 
+      # 2. Build Project (Runs inside the subfolder)
       - name: Build Project
+        working-directory: ./library-frontend
         run: npm run build
 
+      # 3. Deploy to Vercel
+      # We removed 'defaults', so './library-frontend' is now the correct path from Root
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
@@ -37,5 +38,5 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
-          vercel-version: 'latest' # 👈 Crucial Fix
+          vercel-version: 'latest' # Forces the new Vercel CLI
           working-directory: ./library-frontend

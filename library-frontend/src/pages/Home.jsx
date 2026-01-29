@@ -81,7 +81,7 @@ const Home = () => {
   };
   
 // ✅ 3. REPLACE USE_EFFECT WITH USE_QUERY
-  const { data: trendingLibraries = [], isLoading: loading } = useQuery({
+  const { data: trendingLibraries = []} = useQuery({
     queryKey: ['libraries'], // 🔑 SAME KEY as AllLibraries.jsx for shared caching!
     queryFn: async () => {
         const response = await api.get('/libraries');

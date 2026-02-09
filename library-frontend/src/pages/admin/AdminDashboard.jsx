@@ -86,7 +86,7 @@ const AdminDashboard = () => {
   const cards = [
     {
       title: "Total Revenue",
-      value: `₹${stats?.totalRevenue || 0}`,
+      value: formatCurrency(stats?.totalRevenue || 0),
       icon: <IndianRupee className="w-6 h-6 text-emerald-400" />,
       color: "from-emerald-500/20 to-teal-500/5",
       border: "group-hover:border-emerald-500/50",
@@ -157,6 +157,15 @@ const AdminDashboard = () => {
     },
     
   ];
+
+ const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 2, // ✅ Force 2 decimals (e.g. 410.19)
+      maximumFractionDigits: 2 
+    }).format(amount);
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in zoom-in duration-500 pb-10">

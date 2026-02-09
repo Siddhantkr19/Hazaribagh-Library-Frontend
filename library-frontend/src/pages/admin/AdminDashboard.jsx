@@ -70,6 +70,15 @@ const AdminDashboard = () => {
       toast.error("Failed to send emails. Check server logs.", { id: toastId });
     }
   };
+   const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 2, // ✅ Force 2 decimals (e.g. 410.19)
+      maximumFractionDigits: 2 
+    }).format(amount);
+  };
+
 
   if (loading) {
     return (
@@ -158,14 +167,6 @@ const AdminDashboard = () => {
     
   ];
 
- const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      minimumFractionDigits: 2, // ✅ Force 2 decimals (e.g. 410.19)
-      maximumFractionDigits: 2 
-    }).format(amount);
-  };
 
   return (
     <div className="space-y-8 animate-in fade-in zoom-in duration-500 pb-10">

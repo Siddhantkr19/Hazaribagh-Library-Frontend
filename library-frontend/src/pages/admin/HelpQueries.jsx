@@ -20,8 +20,8 @@ const HelpQueries = () => {
 
   const fetchTickets = async () => {
     try {
-      const response = await adminApi.get('/help/all');
-      setTickets(response.data);
+     const data = await adminApi.getAllHelpTickets();
+      setTickets(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Failed to load tickets", error);
     } finally {

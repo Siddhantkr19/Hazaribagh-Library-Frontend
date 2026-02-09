@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import api from '../../services/adminApi'; // <--- USE THIS
+import adminApi from '../../services/adminApi';
 
 const RevenueChart = () => {
   const [data, setData] = useState([]);
@@ -9,13 +9,16 @@ const RevenueChart = () => {
     // Fetch data from our new endpoint
     const fetchData = async () => {
       try {
-        const { data } = await api.get('/admin/revenue-graph');
-        // Format data if needed (e.g., shorten dates)
-        const formattedData = data.map(item => ({
-            name: new Date(item.date).toLocaleDateString('en-US', { weekday: 'short' }), // "Mon", "Tue"
-            revenue: item.revenue
-        }));
-        setData(formattedData);
+       const rawData = await adminApi.getRevenueGraphData();
+        
+        // Safety check: Ensure rawData is an array before mapping
+        if (Array.isArray(rawData)) {
+             const formattedData = rawData.map(item => ({
+                name: new Date(item.date).toLocaleDateString('en-US', { weekday: 'short' }),
+                revenue: item.revenue
+            }));
+            setData(formattedData);
+        }
       } catch (error) {
         console.error("Chart data error", error);
       }

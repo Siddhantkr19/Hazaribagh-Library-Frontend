@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Search, Shield, User, Phone, Mail, MoreVertical } from 'lucide-react';
-import api from '../../services/adminApi'; // <--- USE THIS
+import adminApi from '../../services/adminApi';
 import { toast } from 'react-hot-toast';
 
 const StudentList = () => {
@@ -26,9 +26,11 @@ const StudentList = () => {
 
   const fetchStudents = async () => {
     try {
-      const { data } = await api.get('/admin/students');
-      setStudents(data);
-      setFilteredStudents(data);
+    const data = await adminApi.getAllStudents();
+      
+      const safeData = Array.isArray(data) ? data : [];
+      setStudents(safeData);
+      setFilteredStudents(safeData);
     } catch (error) {
       console.error("Failed to fetch students", error);
       toast.error("Could not load student list.");

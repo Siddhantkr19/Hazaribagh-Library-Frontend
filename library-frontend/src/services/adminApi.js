@@ -63,6 +63,28 @@ export const downloadPaymentReport = async (filters) => {
   // For blobs, the interceptor passes the whole response object
   return response.data; 
 };
+
+// --- REVIEWS (New) ---
+export const getAllReviews = async () => {
+  const response = await api.get('/reviews/admin/all');
+  return response.data;
+};
+
+export const deleteReview = async (reviewId) => {
+  const response = await api.delete(`/reviews/admin/${reviewId}`);
+  return response.message;
+};
+
+// --- HELP TICKETS (New) ---
+export const getAllHelpTickets = async () => {
+  const response = await api.get('/help/all'); // Check your backend route for this!
+  return response.data;
+};
+
+export const resolveHelpTicket = async (ticketId, resolution) => {
+  const response = await api.put(`/help/${ticketId}/resolve`, { resolution });
+  return response.data;
+};
 // ✅ ADD THIS AT THE BOTTOM TO FIX THE ERROR
 const adminApi = {
   getDashboardStats,
@@ -73,7 +95,11 @@ const adminApi = {
   createOfflineBooking,
   cancelBooking,
   downloadPaymentReport,
-  submitHelpTicket
+  submitHelpTicket,
+  getAllReviews,     
+  deleteReview,     
+  getAllHelpTickets, 
+  resolveHelpTicket  
   
 };
 

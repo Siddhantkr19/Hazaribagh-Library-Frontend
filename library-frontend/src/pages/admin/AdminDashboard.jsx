@@ -3,7 +3,8 @@ import { Toaster, toast } from 'react-hot-toast'; // Notification Library
 import RevenueChart from './RevenueChart';
 import OfflineBookingModal from './OfflineBookingModal';
 import WhatsAppBatchModal from './WhatsAppBatchModal';
-import api from '../../services/adminApi';
+// import api from '../../services/adminApi';
+import adminApi from '../../services/adminApi';
 import DownloadReportModal from './DownloadReportModal';
 import bookingApi from '../../services/bookingApi';
 import { 
@@ -27,9 +28,10 @@ const AdminDashboard = () => {
   // 1. Fetch Data from Backend
   const fetchStats = async () => {
     try {
-      const { data } = await api.get('/admin/stats');
-      setStats(data);
-    } catch (error) {
+     const statsData = await adminApi.getDashboardStats();
+      setStats(statsData);
+    }
+     catch (error) {
       console.error("Failed to load admin stats", error);
       // Optional: Check if 401 and redirect to login
       if (error.response && error.response.status === 401) {
@@ -61,7 +63,7 @@ const AdminDashboard = () => {
     
     try {
       // Call the endpoint we created in AdminController
-      await api.post('/admin/trigger-reminders');
+      await adminApi.triggerReminders();
       toast.success("Emails sent successfully!", { id: toastId });
     } catch (error) {
       console.error(error);

@@ -81,8 +81,9 @@ const Home = () => {
   };
   
 // ✅ 3. REPLACE USE_EFFECT WITH USE_QUERY
-  const { data: trendingLibraries = []} = useQuery({
-    queryKey: ['libraries'], // 🔑 SAME KEY as AllLibraries.jsx for shared caching!
+// ✅ FIXED: Removed 'isLoading' completely
+  const { data: trendingLibraries = [] } = useQuery({
+    queryKey: ['libraries'], 
     queryFn: async () => {
         const response = await api.get('/libraries');
         
@@ -96,10 +97,9 @@ const Home = () => {
         if (dataArray.length === 0) return [];
 
         const formattedData = mapBackendDataToFrontend(dataArray);
-        // We only show the top 5 trending
         return formattedData.slice(0, 5);
     },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    staleTime: 1000 * 60 * 5, 
   });
   
   const handleSearchResults = (data) => {

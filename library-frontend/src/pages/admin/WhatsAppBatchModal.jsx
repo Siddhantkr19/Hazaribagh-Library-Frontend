@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, MessageCircle, Check, Copy } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import api from '../../services/adminApi'; // <--- USE THIS// Adjust path if needed
+import adminApi from '../../services/adminApi';
 
 const WhatsAppBatchModal = ({ isOpen, onClose }) => {
   const [students, setStudents] = useState([]);
@@ -20,8 +20,7 @@ const WhatsAppBatchModal = ({ isOpen, onClose }) => {
       // Reuse your stats or bookings endpoint, 
       // OR better: Create a dedicated filter in frontend or backend.
       // For now, let's fetch ALL bookings and filter in JS (Quickest way)
-      const { data } = await api.get('/admin/bookings');
-      
+      const data = await adminApi.getAllBookings();
       const today = new Date();
       const threeDaysLater = new Date();
       threeDaysLater.setDate(today.getDate() + 3);

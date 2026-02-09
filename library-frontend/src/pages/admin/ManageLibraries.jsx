@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Edit2, Trash2, MapPin, IndianRupee, Users, Search } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import api from '../../services/adminApi'; 
+import api from '../../services/api';
 import LibraryFormModal from './LibraryFormModal'; 
 
 const ManageLibraries = () => {

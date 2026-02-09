@@ -79,11 +79,13 @@ const LibraryFormModal = ({ isOpen, onClose, libraryToEdit = null, onSuccess }) 
 
     try {
       // Call the Generic Upload Endpoint
-      const { data: fileUrl } = await api.post('/public/upload', uploadData, {
+      const response = await api.post('/public/upload', uploadData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
+      
+      // Handle unwrapped response from interceptor
+      const fileUrl = typeof response === 'string' ? response : (response.url || response);
 
-      // Add URL to images array
       setFormData(prev => ({ ...prev, images: [...prev.images, fileUrl] }));
       toast.success("Image uploaded!");
     } catch (error) {

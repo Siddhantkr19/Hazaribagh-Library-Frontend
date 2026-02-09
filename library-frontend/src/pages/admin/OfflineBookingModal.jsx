@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Check, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import api from '../../services/adminApi'; 
+import adminApi from '../../services/adminApi'; 
+import bookingApi from '../../services/bookingApi';
 
 const OfflineBookingModal = ({ isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,7 @@ const OfflineBookingModal = ({ isOpen, onClose }) => {
     if (isOpen) {
       const fetchLibs = async () => {
         try {
-          const { data } = await api.get('/libraries');
+          const { data } = await bookingApi.get('/libraries');
           setLibraries(data);
         } catch (error) {
           console.error("Could not load libraries");
@@ -38,23 +39,35 @@ const OfflineBookingModal = ({ isOpen, onClose }) => {
     setLoading(true);
 
     try {
-      // ✅ FIX: URL must be EXACTLY '/admin/book-offline'
-      await api.post('/admin/book-offline', {
+      // Prepare the payload
+      const payload = {
         studentEmail: formData.studentEmail,
         libraryId: Number(formData.libraryId),
         seatNumber: formData.seatNumber,
         amountPaid: Number(formData.amountPaid),
         durationDays: Number(formData.durationDays)
-      });
+      };
+
+      // ✅ FIX 3: Use the adminApi helper function
+      await adminApi.createOfflineBooking(payload);
 
       toast.success("Booking Created Successfully!");
+      // Reset form
+      setFormData({ 
+          studentEmail: '', 
+          libraryId: '', 
+          seatNumber: '', 
+          amountPaid: '', 
+          durationDays: 30 
+      });
+      
       onClose();
-      setFormData({ studentEmail: '', libraryId: '', seatNumber: '', amountPaid: '', durationDays: 30 });
+      
       
     } catch (error) {
       console.error("Booking Error:", error);
-      const errMsg = error.response?.data?.message || error.response?.data || "Failed to create booking.";
-      toast.error(typeof errMsg === 'string' ? errMsg : "Failed to create booking");
+      const errMsg = error.message || "Failed to create booking";
+      toast.error(errMsg);
     } finally {
       setLoading(false);
     }

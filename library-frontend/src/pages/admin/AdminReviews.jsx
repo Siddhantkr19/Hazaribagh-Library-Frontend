@@ -13,9 +13,9 @@ const AdminReviews = () => {
 
   const fetchReviews = async () => {
     try {
-      const response = await adminApi.get('/reviews/admin/all'); 
-      setReviews(response.data);
-    } catch (error) {
+     const data = await adminApi.getAllReviews();
+      setReviews(Array.isArray(data) ? data : []);
+    }catch (error) {
       console.error("Failed to load reviews", error);
     } finally {
       setLoading(false);
@@ -45,6 +45,16 @@ const AdminReviews = () => {
     total: reviews.length,
     avg: reviews.length > 0 ? (reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length).toFixed(1) : 0,
     hidden: reviews.filter(r => !r.isVisible).length
+  };
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this review?")) return;
+    try {
+      await adminApi.deleteReview(id);
+      toast.success("Review deleted");
+      fetchReviews();
+    } catch (error) {
+      toast.error("Failed to delete review");
+    }
   };
 
   return (

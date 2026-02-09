@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Search, Filter, CheckCircle, XCircle, Clock, AlertTriangle, Ban } from 'lucide-react';
-import api from '../../services/adminApi'; 
+import adminApi from '../../services/adminApi';
 import { toast } from 'react-hot-toast';
 
 const BookingList = () => {
@@ -20,9 +20,12 @@ const BookingList = () => {
 
   const fetchBookings = async () => {
     try {
-      const { data } = await api.get('/admin/bookings');
-      setBookings(data);
-      setFilteredBookings(data);
+    const data = await adminApi.getAllBookings();
+      
+      // Ensure data is an array
+      const safeData = Array.isArray(data) ? data : [];
+      setBookings(safeData);
+      setFilteredBookings(safeData);
     } catch (error) {
       console.error("Failed to fetch bookings", error);
     } finally {
@@ -68,10 +71,10 @@ const BookingList = () => {
     }
 
     try {
-      await api.put(`/admin/bookings/${id}/cancel`);
+     await adminApi.cancelBooking(id);
       toast.success("Booking Cancelled");
       fetchBookings(); 
-    } catch (error) {
+    }catch (error) {
       console.error(error);
       toast.error("Failed to cancel booking");
     }

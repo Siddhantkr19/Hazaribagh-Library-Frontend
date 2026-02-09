@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Download, Mail, Loader2, FileText, CheckSquare, Square } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import api from '../../services/adminApi';
+import adminApi from '../../services/adminApi';
 
 const DownloadReportModal = ({ isOpen, onClose, libraries = [] }) => {
   const [loading, setLoading] = useState(false);
@@ -28,38 +28,41 @@ const DownloadReportModal = ({ isOpen, onClose, libraries = [] }) => {
     const toastId = toast.loading("Processing report...");
 
     try {
-      let params = new URLSearchParams();
+      // ✅ FIX 1: Use a plain object named 'filters', not URLSearchParams
+      const filters = {};
       
       // 1. Logic for Filters
       if (reportType === 'STUDENT') {
           if(!targetEmail) throw new Error("Student email is required");
-          params.append('email', targetEmail);
-          if(selectedLib) params.append('libraryId', selectedLib);
+          filters.email = targetEmail;
+          if(selectedLib) filters.libraryId = selectedLib;
       } 
       else if (reportType === 'LIBRARY') {
           if(!selectedLib) throw new Error("Please select a library");
-          params.append('libraryId', selectedLib);
+          filters.libraryId = selectedLib;
       }
       
       // 2. Logic for Emailing
-      if (sendToEmail) params.append('sendTo', sendToEmail);
+      if (sendToEmail) filters.sendTo = sendToEmail;
 
       // 3. API Call
-      // We always request 'blob' because the backend sends the file data back 
-      // regardless of whether we want to save it or not.
-      const response = await api.get(`/admin/reports/payments?${params.toString()}`, {
-        responseType: 'blob', 
-      });
+      // ✅ FIX 2: Pass the 'filters' object we just created
+      const blobData = await adminApi.downloadPaymentReport(filters);
 
       // 4. Logic for Direct Download
       if (downloadDirect) {
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', `Payment_Report_${new Date().toLocaleDateString()}.pdf`);
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
+          if (blobData) {
+            // ✅ FIX 3: Use 'blobData' directly (response.data doesn't exist here)
+            const url = window.URL.createObjectURL(new Blob([blobData]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Payment_Report_${new Date().toLocaleDateString()}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+          } else {
+            throw new Error("Received empty report data");
+          }
       }
 
       // 5. Success Message Logic

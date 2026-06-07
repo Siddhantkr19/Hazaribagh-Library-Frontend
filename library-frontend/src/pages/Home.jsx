@@ -4,6 +4,8 @@ import LibraryCard from '../components/LibraryCard';
 import WelcomeOffer from '../components/WelcomeOffer';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import FAQSection from '../components/FAQSection'; 
+// Adjust the import path if you saved it in a different folder!
 import { useQuery } from '@tanstack/react-query'; // ✅ 1. Import React Query
 const Home = () => {
   
@@ -252,6 +254,11 @@ const Home = () => {
 
           </div>
         </div>
+      </div>
+
+
+<div className="relative z-10 border-t border-gray-200 dark:border-gray-800">
+          <FAQSection />
       </div>
 
     </div>

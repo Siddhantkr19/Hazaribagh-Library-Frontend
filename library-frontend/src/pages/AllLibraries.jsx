@@ -86,20 +86,42 @@ const AllLibraries = () => {
 
   // ✅ 3. OPTIMIZED FILTERING (Replaces the old useEffect)
   // useMemo only recalculates when dependencies change
-  const filteredData = useMemo(() => {
+  // ✅ REPLACE YOUR CURRENT useMemo FILTER BLOCK WITH THIS
+const filteredData = useMemo(() => {
+    if (!libraries || libraries.length === 0) return [];
+    
     let result = libraries;
     
-    if (activeFilter === 'Matwari') result = result.filter(lib => lib.locationTag.toLowerCase().includes('matwari'));
-    else if (activeFilter === 'Korrah') result = result.filter(lib => lib.locationTag.toLowerCase().includes('korrah')); // Fixed 'location' -> 'locationTag'
-    else if (activeFilter === 'Under 400') result = result.filter(lib => lib.offerPrice <= 400);
-    else if (activeFilter === 'AC') result = result.filter(lib => lib.amenities.includes('AC')); 
+    // 2. Safely apply category filters
+    if (activeFilter === 'Matwari') {
+        result = result.filter(lib => lib.locationTag?.toLowerCase().includes('matwari'));
+    } else if (activeFilter === 'Korrah') {
+        result = result.filter(lib => lib.locationTag?.toLowerCase().includes('korrah'));
+    } else if (activeFilter === 'Under 400') {
+        result = result.filter(lib => lib.offerPrice <= 400);
+    } else if (activeFilter === 'Under 500') { // Added this filter
+        result = result.filter(lib => lib.offerPrice <= 500);
+    } else if (activeFilter === 'AC') {
+        result = result.filter(lib => lib.amenities?.some(a => a.toLowerCase().includes('ac')));
+    }
 
+    // 3. Updated Search Query (Handles text OR price numbers)
     if (searchQuery) {
         const lowerQuery = searchQuery.toLowerCase();
-        result = result.filter(lib => lib.name.toLowerCase().includes(lowerQuery) || lib.locationTag.toLowerCase().includes(lowerQuery));
+        const numericQuery = parseInt(searchQuery); // Convert text to number if possible
+        
+        result = result.filter(lib => {
+            const nameMatch = lib.name?.toLowerCase().includes(lowerQuery);
+            const locationMatch = lib.locationTag?.toLowerCase().includes(lowerQuery);
+            // If searchQuery is a number, check if price <= number
+            const priceMatch = !isNaN(numericQuery) && (lib.offerPrice <= numericQuery);
+            
+            return nameMatch || locationMatch || priceMatch;
+        });
     }
+    
     return result;
-  }, [libraries, searchQuery, activeFilter]);
+}, [libraries, searchQuery, activeFilter]);
 
   const FilterButton = ({ label, value }) => (
     <button 

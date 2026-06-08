@@ -183,7 +183,11 @@ const Login = () => {
           </div>
 
           <a 
+<<<<<<< HEAD
             // href="https://libhub-backend.onrender.com/oauth2/authorization/google"
+=======
+            href="https://libhub-backend.onrender.com/oauth2/authorization/google"
+>>>>>>> 6015ad037d47721b8452f8bd4e0e720dfcc2aa81
             // href="http://localhost:8080/oauth2/authorization/google"
             href={
     window.location.hostname === 'localhost' 

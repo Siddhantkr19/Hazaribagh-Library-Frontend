@@ -75,7 +75,7 @@ const FAQSection = () => {
   const [activeTab, setActiveTab] = useState(faqs[0].id);
 
   return (
-    <section className="py-24 bg-gray-50 dark:bg-gray-900 relative z-10">
+    <section className="py-12 bg-gray-50 dark:bg-gray-900 relative z-10">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="text-center mb-14">
@@ -106,7 +106,7 @@ const FAQSection = () => {
           ))}
         </div>
 
-        <div className="min-h-[300px]">
+        <div className="min-h-min">
           {faqs.map((category) => (
             <div 
               key={category.id} 

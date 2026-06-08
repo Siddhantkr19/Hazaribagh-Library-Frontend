@@ -189,8 +189,8 @@ const Login = () => {
             // href="http://localhost:8080/oauth2/authorization/google"
             href={
     window.location.hostname === 'localhost' 
-      ? "https://libhub-backend.onrender.com/oauth2/authorization/google"
-      : "http://localhost:8080/oauth2/authorization/google"
+      ? "http://localhost:8080/oauth2/authorization/google"
+      : "https://libhub-backend.onrender.com/oauth2/authorization/google"
       
   }
 

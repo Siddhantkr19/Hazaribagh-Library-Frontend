@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Check, Loader2, UploadCloud, Wifi, Zap, Droplets, Lock, ShieldCheck, Trash2, Car } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import api from '../../services/api'; // Ensure this points to the base Axios instance
+import api from '../../services/adminApi';
 
 // 🛠️ CONFIG: Predefined Amenities List
 const AMENITY_OPTIONS = [

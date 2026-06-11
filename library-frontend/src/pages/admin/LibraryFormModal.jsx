@@ -113,20 +113,26 @@ const LibraryFormModal = ({ isOpen, onClose, libraryToEdit = null, onSuccess }) 
     }));
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     const formattedAmenities = formData.amenities.map(item => ({ name: item }));
     const formattedImages = formData.images.map(imgUrl => ({ imageUrl: imgUrl }));
 
+    // ✅ FIX: Construct the payload manually to ensure no unexpected objects slip in
     const payload = {
-      ...formData,
-      amenities: formattedAmenities,
-      images: formattedImages,
+      name: formData.name,
+      address: formData.address,
+      locationTag: formData.locationTag,
+      description: formData.description, // This must be a simple String!
       originalPrice: Number(formData.originalPrice),
       offerPrice: Number(formData.offerPrice),
-      totalSeats: Number(formData.totalSeats)
+      totalSeats: Number(formData.totalSeats),
+      contactNumber: formData.contactNumber,
+      openingHours: formData.openingHours,
+      amenities: formattedAmenities,
+      images: formattedImages
     };
 
     try {
@@ -140,8 +146,8 @@ const LibraryFormModal = ({ isOpen, onClose, libraryToEdit = null, onSuccess }) 
       onSuccess();
       onClose();
     } catch (error) {
-      console.error("FULL API ERROR:", error.response || error);
-      toast.error("Failed to save. Check the console for missing fields.");
+      console.error("API Error Details:", error);
+      toast.error("Failed to save. Check the console for details.");
     } finally {
       setLoading(false);
     }

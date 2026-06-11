@@ -29,17 +29,42 @@ const LibraryFormModal = ({ isOpen, onClose, libraryToEdit = null, onSuccess }) 
   });
 
   // Populate Data on Open
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     if (libraryToEdit) {
+  //       setFormData({
+  //         ...libraryToEdit,
+  //         // Ensure these are arrays even if backend sends null
+  //         amenities: Array.isArray(libraryToEdit.amenities) ? libraryToEdit.amenities : [],
+  //         images: Array.isArray(libraryToEdit.images) ? libraryToEdit.images : []
+  //       });
+  //     } else {
+  //       // Reset for New Entry
+  //       setFormData({
+  //         name: '', address: '', locationTag: '', description: '',
+  //         originalPrice: '', offerPrice: '', openingHours: '6 AM - 10 PM',
+  //         totalSeats: '', contactNumber: '', amenities: [], images: []
+  //       });
+  //     }
+  //   }
+  // }, [libraryToEdit, isOpen]);
+
   useEffect(() => {
     if (isOpen) {
       if (libraryToEdit) {
         setFormData({
           ...libraryToEdit,
-          // Ensure these are arrays even if backend sends null
-          amenities: Array.isArray(libraryToEdit.amenities) ? libraryToEdit.amenities : [],
-          images: Array.isArray(libraryToEdit.images) ? libraryToEdit.images : []
+          // ✅ FIX: Extract string ids from amenity entities if backend populated them as objects
+          amenities: Array.isArray(libraryToEdit.amenities) 
+            ? libraryToEdit.amenities.map(item => typeof item === 'string' ? item : (item.name || item.id)) 
+            : [],
+          // ✅ FIX: Extract raw image string URLs from image mapping models
+          images: Array.isArray(libraryToEdit.images) 
+            ? libraryToEdit.images.map(img => typeof img === 'string' ? img : img.imageUrl) 
+            : []
         });
       } else {
-        // Reset for New Entry
+        // Reset state values cleanly for fresh additions
         setFormData({
           name: '', address: '', locationTag: '', description: '',
           originalPrice: '', offerPrice: '', openingHours: '6 AM - 10 PM',
@@ -104,17 +129,52 @@ const LibraryFormModal = ({ isOpen, onClose, libraryToEdit = null, onSuccess }) 
     }));
   };
 
-  const handleSubmit = async (e) => {
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setLoading(true);
+
+//     // Prepare payload (Convert numbers)
+//     // 1. Convert ["Wi-Fi", "AC"]  --->  [{ name: "Wi-Fi" }, { name: "AC" }]
+//     const formattedAmenities = formData.amenities.map(item => ({ name: item }));
+//     // 2. ⚠️ NEW FIX: Fix Images mapping
+// // Assuming your LibraryImage entity has a 'url' field
+
+// const formattedImages = formData.images.map(imgUrl => ({ imageUrl: imgUrl }));
+
+//     const payload = {
+//       ...formData,
+//       amenities: formattedAmenities,
+//       images: formattedImages,
+//       originalPrice: Number(formData.originalPrice),
+//       offerPrice: Number(formData.offerPrice),
+//       totalSeats: Number(formData.totalSeats)
+//     };
+
+//     try {
+//       if (libraryToEdit) {
+//         await api.put(`/libraries/${libraryToEdit.id}`, payload);
+//         toast.success("Library Updated!");
+//       } else {
+//         await api.post('/libraries', payload);
+//         toast.success("Library Created!");
+//       }
+//       onSuccess();
+//       onClose();
+//     } catch (error) {
+//       toast.error("Failed to save. Check your inputs.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+
+const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // Prepare payload (Convert numbers)
-    // 1. Convert ["Wi-Fi", "AC"]  --->  [{ name: "Wi-Fi" }, { name: "AC" }]
+    // ✅ Line 96: Convert simple string arrays into structured database entity models
     const formattedAmenities = formData.amenities.map(item => ({ name: item }));
-    // 2. ⚠️ NEW FIX: Fix Images mapping
-// Assuming your LibraryImage entity has a 'url' field
-
-const formattedImages = formData.images.map(imgUrl => ({ imageUrl: imgUrl }));
+    const formattedImages = formData.images.map(imgUrl => ({ imageUrl: imgUrl }));
 
     const payload = {
       ...formData,
@@ -136,12 +196,13 @@ const formattedImages = formData.images.map(imgUrl => ({ imageUrl: imgUrl }));
       onSuccess();
       onClose();
     } catch (error) {
+      console.error("API Error Details:", error.response?.data || error.message);
       toast.error("Failed to save. Check your inputs.");
     } finally {
       setLoading(false);
     }
   };
-
+  
   if (!isOpen) return null;
 
   const inputClass = "w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all text-sm";

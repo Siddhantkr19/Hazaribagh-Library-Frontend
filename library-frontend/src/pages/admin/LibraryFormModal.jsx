@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Check, Loader2, UploadCloud, Wifi, Zap, Droplets, Lock, ShieldCheck, Trash2, Car } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import api from '../../services/adminApi';
+import api from '../../services/api'; // Ensure this points to the base Axios instance
 
 // 🛠️ CONFIG: Predefined Amenities List
 const AMENITY_OPTIONS = [
@@ -24,41 +24,21 @@ const LibraryFormModal = ({ isOpen, onClose, libraryToEdit = null, onSuccess }) 
     name: '', address: '', locationTag: '', description: '',
     originalPrice: '', offerPrice: '', openingHours: '6 AM - 10 PM',
     totalSeats: '', contactNumber: '',
-    amenities: [], // ✅ Array for Toggles
-    images: []     // ✅ Array for Images
+    amenities: [], 
+    images: []    
   });
 
   // Populate Data on Open
-  // useEffect(() => {
-  //   if (isOpen) {
-  //     if (libraryToEdit) {
-  //       setFormData({
-  //         ...libraryToEdit,
-  //         // Ensure these are arrays even if backend sends null
-  //         amenities: Array.isArray(libraryToEdit.amenities) ? libraryToEdit.amenities : [],
-  //         images: Array.isArray(libraryToEdit.images) ? libraryToEdit.images : []
-  //       });
-  //     } else {
-  //       // Reset for New Entry
-  //       setFormData({
-  //         name: '', address: '', locationTag: '', description: '',
-  //         originalPrice: '', offerPrice: '', openingHours: '6 AM - 10 PM',
-  //         totalSeats: '', contactNumber: '', amenities: [], images: []
-  //       });
-  //     }
-  //   }
-  // }, [libraryToEdit, isOpen]);
-
   useEffect(() => {
     if (isOpen) {
       if (libraryToEdit) {
         setFormData({
           ...libraryToEdit,
-          // ✅ FIX: Extract string ids from amenity entities if backend populated them as objects
+          // Extract string ids from amenity entities
           amenities: Array.isArray(libraryToEdit.amenities) 
             ? libraryToEdit.amenities.map(item => typeof item === 'string' ? item : (item.name || item.id)) 
             : [],
-          // ✅ FIX: Extract raw image string URLs from image mapping models
+          // Extract raw image string URLs
           images: Array.isArray(libraryToEdit.images) 
             ? libraryToEdit.images.map(img => typeof img === 'string' ? img : img.imageUrl) 
             : []
@@ -79,36 +59,40 @@ const LibraryFormModal = ({ isOpen, onClose, libraryToEdit = null, onSuccess }) 
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ LOGIC: Toggle Amenity Selection
+  // Toggle Amenity Selection
   const toggleAmenity = (amenityId) => {
     setFormData(prev => {
       const exists = prev.amenities.includes(amenityId);
       let newAmenities;
       if (exists) {
-        newAmenities = prev.amenities.filter(item => item !== amenityId); // Remove
+        newAmenities = prev.amenities.filter(item => item !== amenityId); 
       } else {
-        newAmenities = [...prev.amenities, amenityId]; // Add
+        newAmenities = [...prev.amenities, amenityId]; 
       }
       return { ...prev, amenities: newAmenities };
     });
   };
 
-  // ✅ LOGIC: Upload Image
+  // Upload Image
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // ✅ FIX 2: Added 5MB file size limit to prevent 413 errors!
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File is too large! Please upload an image under 5MB.");
+      return;
+    }
 
     setUploading(true);
     const uploadData = new FormData();
     uploadData.append('file', file);
 
     try {
-      // Call the Generic Upload Endpoint
       const response = await api.post('/public/upload', uploadData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
-      // Handle unwrapped response from interceptor
       const fileUrl = typeof response === 'string' ? response : (response.url || response);
 
       setFormData(prev => ({ ...prev, images: [...prev.images, fileUrl] }));
@@ -121,7 +105,7 @@ const LibraryFormModal = ({ isOpen, onClose, libraryToEdit = null, onSuccess }) 
     }
   };
 
-  // Logic: Remove Image
+  // Remove Image
   const removeImage = (indexToRemove) => {
     setFormData(prev => ({
       ...prev,
@@ -129,50 +113,10 @@ const LibraryFormModal = ({ isOpen, onClose, libraryToEdit = null, onSuccess }) 
     }));
   };
 
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setLoading(true);
-
-//     // Prepare payload (Convert numbers)
-//     // 1. Convert ["Wi-Fi", "AC"]  --->  [{ name: "Wi-Fi" }, { name: "AC" }]
-//     const formattedAmenities = formData.amenities.map(item => ({ name: item }));
-//     // 2. ⚠️ NEW FIX: Fix Images mapping
-// // Assuming your LibraryImage entity has a 'url' field
-
-// const formattedImages = formData.images.map(imgUrl => ({ imageUrl: imgUrl }));
-
-//     const payload = {
-//       ...formData,
-//       amenities: formattedAmenities,
-//       images: formattedImages,
-//       originalPrice: Number(formData.originalPrice),
-//       offerPrice: Number(formData.offerPrice),
-//       totalSeats: Number(formData.totalSeats)
-//     };
-
-//     try {
-//       if (libraryToEdit) {
-//         await api.put(`/libraries/${libraryToEdit.id}`, payload);
-//         toast.success("Library Updated!");
-//       } else {
-//         await api.post('/libraries', payload);
-//         toast.success("Library Created!");
-//       }
-//       onSuccess();
-//       onClose();
-//     } catch (error) {
-//       toast.error("Failed to save. Check your inputs.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // ✅ Line 96: Convert simple string arrays into structured database entity models
     const formattedAmenities = formData.amenities.map(item => ({ name: item }));
     const formattedImages = formData.images.map(imgUrl => ({ imageUrl: imgUrl }));
 
@@ -196,8 +140,8 @@ const handleSubmit = async (e) => {
       onSuccess();
       onClose();
     } catch (error) {
-      console.error("API Error Details:", error.response?.data || error.message);
-      toast.error("Failed to save. Check your inputs.");
+      console.error("FULL API ERROR:", error.response || error);
+      toast.error("Failed to save. Check the console for missing fields.");
     } finally {
       setLoading(false);
     }
@@ -241,6 +185,12 @@ const handleSubmit = async (e) => {
             <textarea required name="address" value={formData.address} onChange={handleChange} className={`${inputClass} min-h-[60px]`} placeholder="Detailed address..." />
           </div>
 
+          {/* ✅ FIX 1: ADDED THE MISSING DESCRIPTION FIELD HERE! */}
+          <div>
+            <label className={labelClass}>Library Description</label>
+            <textarea required name="description" value={formData.description} onChange={handleChange} className={`${inputClass} min-h-[80px]`} placeholder="Write a short description about the library facilities..." />
+          </div>
+
           {/* Pricing & Seats */}
           <div className="grid grid-cols-3 gap-4">
              <div>
@@ -264,7 +214,7 @@ const handleSubmit = async (e) => {
              </div>
              <div>
                 <label className={labelClass}>Opening Hours</label>
-                <input name="openingHours" value={formData.openingHours} onChange={handleChange} className={inputClass} />
+                <input required name="openingHours" value={formData.openingHours} onChange={handleChange} className={inputClass} />
              </div>
           </div>
 
@@ -304,7 +254,7 @@ const handleSubmit = async (e) => {
                     <input 
                         type="file" 
                         id="imgUpload" 
-                        accept="image/png, image/jpeg, image/jpg , image/webp" 
+                        accept="image/png, image/jpeg, image/jpg, image/webp" 
                         onChange={handleFileUpload} 
                         className="hidden" 
                         disabled={uploading}

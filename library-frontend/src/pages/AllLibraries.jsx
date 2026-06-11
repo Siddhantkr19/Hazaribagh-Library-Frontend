@@ -55,7 +55,7 @@ const AllLibraries = () => {
         return libraryList.map(lib => ({
             id: lib.id,
             name: lib.name,
-            locationTag: lib.locationTag || lib.address || "Hazaribagh", 
+            locationTag: lib.locationTag || lib.address || "Bokaro", 
             totalSeats: lib.totalSeats || 0,
             offerPrice: lib.offerPrice,
             originalPrice: lib.originalPrice,
@@ -93,10 +93,10 @@ const filteredData = useMemo(() => {
     let result = libraries;
     
     // 2. Safely apply category filters
-    if (activeFilter === 'Matwari') {
-        result = result.filter(lib => lib.locationTag?.toLowerCase().includes('matwari'));
-    } else if (activeFilter === 'Korrah') {
-        result = result.filter(lib => lib.locationTag?.toLowerCase().includes('korrah'));
+    if (activeFilter === ' Sector 04') {
+        result = result.filter(lib => lib.locationTag?.toLowerCase().includes(' Sector 04'));
+    } else if (activeFilter === 'Chas') {
+        result = result.filter(lib => lib.locationTag?.toLowerCase().includes('Chas'));
     } else if (activeFilter === 'Under 400') {
         result = result.filter(lib => lib.offerPrice <= 400);
     } else if (activeFilter === 'Under 500') { // Added this filter
@@ -149,7 +149,7 @@ const filteredData = useMemo(() => {
             Explore All Libraries
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Browse through our verified list of study spaces in Hazaribagh.
+            Browse through our verified list of study spaces in Bokaro.
           </p>
         </div>
 
@@ -174,8 +174,8 @@ const filteredData = useMemo(() => {
 
             <div className="flex flex-wrap justify-center gap-3">
                 <FilterButton label="All" value="All" />
-                <FilterButton label="📍 Matwari" value="Matwari" />
-                <FilterButton label="📍 Korrah" value="Korrah" />
+                <FilterButton label="📍  Sector 04" value=" Sector 04" />
+                <FilterButton label="📍 Chas" value="Chas" />
                 <FilterButton label="💰 Under ₹400" value="Under 400" />
                 <FilterButton label="❄️ AC" value="AC" />
             </div>

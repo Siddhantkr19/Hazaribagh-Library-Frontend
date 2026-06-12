@@ -4,7 +4,7 @@ import ScrollToTop from './components/ScrollToTop'; // Ensure you created this f
 // --- USER COMPONENTS ---
 import Navbar from "./components/Navbar";
 import Footer from './components/Footer';
-import FallingBackground from './components/FallingBackground';
+// import FallingBackground from './components/FallingBackground';
 
 // --- USER PAGES ---
 import Home from "./pages/Home";
@@ -36,7 +36,7 @@ import AdminReviews from './pages/admin/AdminReviews';
 const MainLayout = () => (
   <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 font-sans relative">
     {/* Global Background */}
-    <FallingBackground />
+    {/* <FallingBackground /> */}
 
     {/* Content */}
     <div className="relative z-20 flex flex-col min-h-screen">

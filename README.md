@@ -1,11 +1,11 @@
-# 📚 Bokaro Libraries - Frontend
+# 📚 Hazaribagh Libraries - Frontend
 
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white)
 
-The official **User Interface** for the Bokaro Library Management System. This Single Page Application (SPA) allows students to discover study centers, view dynamic pricing offers (₹350 vs ₹400), and manage their seat subscriptions.
+The official **User Interface** for the Hazaribagh Library Management System. This Single Page Application (SPA) allows students to discover study centers, view dynamic pricing offers (₹350 vs ₹400), and manage their seat subscriptions.
 
 > **Note:** This is the Frontend repository. The Backend API (Spring Boot) can be found [here](LINK_TO_YOUR_BACKEND_REPO).
 
@@ -15,7 +15,7 @@ The official **User Interface** for the Bokaro Library Management System. This S
 
 * **⚡ Blazing Fast Performance:** Built with **Vite** for instant server starts and HMR (Hot Module Replacement).
 * **🎨 Modern UI:** Fully responsive design using **Tailwind CSS** following Atomic Design principles.
-* **🔍 Smart Search:** Real-time filtering of libraries by location (e.g., " Sector 04") or price budget.
+* **🔍 Smart Search:** Real-time filtering of libraries by location (e.g., " Korrah") or price budget.
 * **📊 Student Dashboard:** A dedicated space to view active seat validity ("29 Days Remaining") and payment receipts.
 * **🔐 Secure Navigation:** React Router implementation to manage public vs. private pages.
 
@@ -44,7 +44,7 @@ Make sure you have **Node.js** (v18 or higher) installed.
 ### 2. Clone and Install
 ```bash
 # Clone the repository
-git clone [https://github.com/your-username/Bokaro-library-frontend.git](https://github.com/your-username/Bokaro-library-frontend.git)
+git clone [https://github.com/your-username/Hazaribagh-library-frontend.git](https://github.com/your-username/Hazaribagh-library-frontend.git)
 
 # Navigate into the folder
 cd library-frontend

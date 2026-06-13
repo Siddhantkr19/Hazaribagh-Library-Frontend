@@ -149,7 +149,7 @@ const WelcomeOffer = () => {
                   1. About LibHub Service
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed text-justify">
-                  <strong>LibHub (Bokaro Libraries)</strong> acts as a digital aggregator connecting students with premium private study centers in  Sector 04, Chas, and Babu Gaon. We provide a platform for discovery, booking, and payment management. We are not the owners of the physical library infrastructure but facilitate the reservation process.
+                  <strong>LibHub (Hazaribagh Libraries)</strong> acts as a digital aggregator connecting students with premium private study centers in  Korrah, Matwari, and Babu Gaon. We provide a platform for discovery, booking, and payment management. We are not the owners of the physical library infrastructure but facilitate the reservation process.
                 </p>
               </div>
 

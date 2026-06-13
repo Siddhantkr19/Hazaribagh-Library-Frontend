@@ -1,7 +1,7 @@
 # 🎨 CSS & RESPONSIVE DESIGN AUDIT REPORT
 
 **Date**: December 17, 2025  
-**Project**: LibHub - Bokaro Library Frontend  
+**Project**: LibHub - Hazaribagh Library Frontend  
 **Status**: ⚠️ CRITICAL ISSUES FOUND
 
 ---

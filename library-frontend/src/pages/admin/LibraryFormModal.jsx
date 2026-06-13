@@ -182,7 +182,7 @@ const LibraryFormModal = ({ isOpen, onClose, libraryToEdit = null, onSuccess }) 
              </div>
              <div>
                <label className={labelClass}>Location Tag</label>
-               <input required name="locationTag" value={formData.locationTag} onChange={handleChange} className={inputClass} placeholder="e.g.  Sector 04" />
+               <input required name="locationTag" value={formData.locationTag} onChange={handleChange} className={inputClass} placeholder="e.g.  Korrah" />
              </div>
           </div>
 

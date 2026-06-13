@@ -7,7 +7,7 @@ const faqs = [
     icon: <Compass className="w-5 h-5" />,
     label: "Getting Started",
     questions: [
-      { q: "What is LibHub?", a: "LibHub is Bokaro’s first digital marketplace for students. It allows you to discover, compare, and instantly book seats at top physical study centers across areas like  Sector 04 and Korra." },
+      { q: "What is LibHub?", a: "LibHub is Hazaribagh’s first digital marketplace for students. It allows you to discover, compare, and instantly book seats at top physical study centers across areas like  Korrah and Korra." },
       { q: "How do I find the best library for me?", a: "Use our smart search feature on the homepage! Filter by location or sort by your monthly budget to find your perfect focus zone." }
     ]
   },
@@ -83,7 +83,7 @@ const FAQSection = () => {
             Frequently <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600">Asked</span> Questions
           </h2>
           <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">
-            Everything you need to know about discovering, booking, and managing your perfect study space in Bokaro.
+            Everything you need to know about discovering, booking, and managing your perfect study space in Hazaribagh.
           </p>
         </div>
 
